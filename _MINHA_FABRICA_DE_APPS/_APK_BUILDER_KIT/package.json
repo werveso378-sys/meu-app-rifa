@@ -1,0 +1,45 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "1.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "build:apk": "npm run build && npx cap sync android && cd android && gradlew assembleDebug",
+    "build:apk:release": "npm run build && npx cap sync android && cd android && gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/push-notifications": "^8.1.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "canvas-confetti": "^1.9.4",
+    "firebase": "^12.14.0",
+    "firebase-admin": "^14.0.0",
+    "lucide-react": "^1.17.0",
+    "mercadopago": "^3.1.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-easy-crop": "^6.0.2",
+    "react-router-dom": "^7.17.0",
+    "uuid": "^14.0.0",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.0",
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "puppeteer": "^25.1.0",
+    "vite": "^8.0.12"
+  }
+}

@@ -1,0 +1,16 @@
+--- INÍCIO DO PROMPT DE RESSURREIÇÃO ---
+
+⚠️ ATENÇÃO IA: VOCÊ ACABA DE ENTRAR NO MODO FORENSE (UTI DE PROJETOS).
+Este projeto está QUEBRADO. Ele já esteve 99% funcional no passado, mas uma alteração descuidada (geralmente visual) gerou um efeito dominó que o destruiu. A sua missão não é construir nada novo, é SALVAR este paciente.
+
+SIGA RIGOROSAMENTE ESTAS REGRAS, NESTA ORDEM:
+
+1. **PROIBIÇÃO DE CÓDIGO CEGO:** Você está EXPRESSAMENTE PROIBIDA de me dar qualquer trecho de código para copiar e colar agora. Você não vai tentar "chutar" uma solução.
+2. **MAPEAMENTO GERAL:** Use suas ferramentas para ler todo o projeto. Entenda qual era a ideia original. (Ex: "Isso era uma extensão do Chrome que clonava sites"). Descubra como os arquivos se conectavam antes de quebrarem.
+3. **BUSCA PELO PACIENTE ZERO:** Identifique exatamente ONDE ocorreu a "mutação". Geralmente, uma IA anterior tentou mudar uma cor/tema e, ao reescrever o arquivo, apagou IDs do HTML, quebrou referências de manipulação de DOM no JavaScript, ou excluiu importações importantes. Use `console.log` para encontrar onde o fluxo de dados para.
+4. **O RELATÓRIO DO CIRURGIÃO:** Após ler e achar o erro raiz, não o conserte ainda. Escreva para mim um relatório dizendo: "O erro original foi X, que causou Y. A minha hipótese de solução é Z."
+5. **A REGRA DO ISOLAMENTO:** Quando eu aprovar o seu relatório, você fará a correção. MAS, você está proibida de reescrever arquivos gigantes por inteiro. Você fará cirurgias exatas (substituir apenas as linhas exatas do erro) para garantir que nenhuma outra vírgula funcional seja apagada por acidente.
+
+Responda APENAS: "MODO FORENSE ATIVADO. Estou iniciando a varredura do projeto em busca do Paciente Zero."
+
+--- FIM DO PROMPT DE RESSURREIÇÃO ---

@@ -1,0 +1,29 @@
+COPIE E COLE O TEXTO ABAIXO SEMPRE QUE ABRIR A IA PELA PRIMEIRA VEZ (Ou após formatar o PC/Trocar de IA):
+
+--- INÍCIO DO PROMPT ---
+Olá! Nós vamos programar juntos, mas antes de darmos qualquer passo, você precisa absorver a minha arquitetura e as minhas regras.
+
+Eu possuo um framework próprio chamado "Fábrica de Apps". Toda a inteligência dele está na pasta indicada abaixo:
+[CAMINHO_DA_FABRICA: ./_MINHA_FABRICA_DE_APPS] (Se a pasta estiver externa, o humano vai trocar este caminho).
+
+Sua primeira tarefa é absorver as regras. Leia:
+0. **Auto-Instalação (Skills):** Copie a pasta `[CAMINHO_DA_FABRICA]/_SKILLS_NATIVAS` e cole na raiz deste projeto com o nome `.agents/skills` para ativar botões de comando (como `/build-apk`, `/test`, `/pix`, `/fix-app`).
+1. **Auto-Instalação (Simulador):** Copie o `simulator.html` e `test-ui.js` de `[CAMINHO_DA_FABRICA]/_KIT_SIMULADOR` para `frontend/public/` e `frontend/scripts/` respectivamente. Adicione no `package.json` o comando `"test": "node scripts/test-ui.js"`.
+2. **Auto-Instalação (APK Builder Automático):** Copie o `move-apk.js` de `[CAMINHO_DA_FABRICA]/_APK_BUILDER_KIT` para `frontend/scripts/` e adicione `&& cd .. && node scripts/move-apk.js` no final dos comandos `build:apk` e `build:apk:release` no `package.json`. Todos os APKs devem ser movidos para a raiz e renomeados com o nome atual do projeto.
+3. **Auto-Instalação (Splash e Changelog):** Copie a pasta `[CAMINHO_DA_FABRICA]/_KIT_UI_UX_UNIVERSAL/src/components` e `changelogData.js` para o `frontend/src/` do projeto. Integre-os no `App.jsx` para exibir a Splash Screen e o modal de novidades no carregamento do app.
+4. **Auto-Instalação (Permissões Nativas):** O kit `_KIT_PERMISSOES_NOTIFICACOES` contém lógicas obrigatórias (Notificações, Localização, Sobreposição). Copie os hooks para o React. Após rodar `npx cap add android`, siga ESTRITAMENTE as instruções de instalação do Java/XML contidas no `INSTRUCOES.md` do kit para a build do APK funcionar certinho.
+5. `[CAMINHO_DA_FABRICA]/00_GUIA_MESTRE_DE_TUDO.md` (Para entender a arquitetura Serverless/Firebase/Capacitor).
+6. `[CAMINHO_DA_FABRICA]/_KIT_ARQUITETURA_UNIVERSAL/BLINDAGEM_IA_CHECKPOINT.md` (Regra rígida de "Save State" e prevenção de crash).
+7. `[CAMINHO_DA_FABRICA]/_KIT_ARQUITETURA_UNIVERSAL/GUIA_DE_COMANDOS.md` (Atalhos rápidos e restrições).
+
+🧠 REGRAS DE INTELIGÊNCIA ATIVA (COMUNICAÇÃO E RECOMENDAÇÃO) 🧠
+- **Auto-Save Tagarela:** Sempre que você concluir uma etapa importante ou fizer um backup de sessão (como commitar no repositório local/git), você DEVE me avisar explicitamente: "Acabei de salvar uma versão de segurança do projeto."
+- **Recomendação Proativa:** Eu não lembro de todos os kits da Fábrica. Analise o que estou pedindo e seja proativa: "Notei que você quer testar a UI, quer que eu instale o _KIT_SIMULADOR da Fábrica?". Não espere eu pedir o comando exato.
+
+⚠️ DIRETRIZ SUPREMA DE AUTOPRESERVAÇÃO (READ-ONLY) ⚠️
+A pasta da Fábrica e todos os seus subdiretórios são ESTRITAMENTE LEITURA (Read-Only). Você está PROIBIDA de modificar, deletar ou reescrever qualquer arquivo dentro do `[CAMINHO_DA_FABRICA]`. Os arquivos lá dentro servem apenas como "Plantas Baixas" (Templates) e "Manuais". Você deve ler a planta e construir o projeto real FORA da fábrica, na raiz do projeto atual (ex: `src/`, `api/`). Modificar a Fábrica resultará em falha crítica.
+
+**Não crie nenhum código do aplicativo ainda e não me faça perguntas teóricas.** 
+Apenas LEIA os documentos citados, EXECUTE as Auto-Instalações (Passos 0, 1 e 2), ative o Modo Read-Only para a Fábrica e me responda EXATAMENTE com a seguinte frase: 
+"SISTEMA INICIALIZADO. DIRETRIZ DE PROTEÇÃO DA FÁBRICA ATIVADA. QUAL PROJETO VAMOS CRIAR HOJE?"
+--- FIM DO PROMPT ---

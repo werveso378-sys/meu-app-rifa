@@ -1,0 +1,40 @@
+/* 
+   🎨 COFRE DE CORES (DESIGN SYSTEM BASE)
+   ATENÇÃO IA: SE O USUÁRIO PEDIR PARA MUDAR UMA COR OU TEMA, ALTERE APENAS AQUI!
+   NÃO USE CLASSES HARDCODED DE CORES NO JSX (NÃO USE text-red-500). 
+   USE AS VARIÁVEIS DAQUI (ex: text-[var(--cor-primaria)] no Tailwind).
+*/
+
+:root {
+  /* Cores Principais do Projeto */
+  --cor-fundo-app: #ffffff;
+  --cor-fundo-painel: #f3f4f6;
+  
+  --cor-primaria: #007bff;
+  --cor-primaria-hover: #0056b3;
+  
+  --cor-secundaria: #6c757d;
+  --cor-sucesso: #28a745; /* Verde para PAGO / OK */
+  --cor-erro: #dc3545;    /* Vermelho para CANCELADO / ERRO */
+  
+  /* Textos */
+  --cor-texto-principal: #212529;
+  --cor-texto-secundario: #6c757d;
+  --cor-texto-botao: #ffffff;
+
+  /* Bordas e Sombras */
+  --raio-borda-padrao: 8px;
+  --sombra-padrao: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 
+  Exemplo de Modo Escuro Automático (Descomente e edite se necessário)
+*/
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo-app: #121212;
+    --cor-texto-principal: #f8f9fa;
+  }
+}
+*/

@@ -1,0 +1,6 @@
+{
+  "name": "Chá Rifa",
+  "description": "Gerencie pontos e presentes (Pix/Mimo) do seu Chá Rifa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

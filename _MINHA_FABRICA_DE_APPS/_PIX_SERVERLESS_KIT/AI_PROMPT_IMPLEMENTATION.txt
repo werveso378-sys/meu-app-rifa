@@ -1,0 +1,18 @@
+ESTE É O PROMPT UNIVERSAL DE IMPLEMENTAÇÃO.
+COPIE O TEXTO ABAIXO E ENVIE PARA A IA EM QUALQUER NOVO PROJETO QUE PRECISE DE PIX:
+
+--- INÍCIO DO PROMPT ---
+Olá, IA! Estou iniciando a integração de Pix neste novo projeto. Nós vamos usar uma arquitetura Vercel Serverless + Firebase Realtime, que é 100% gratuita, não dorme e tem latência zero.
+
+Na pasta raiz deste projeto, existe um diretório chamado `_PIX_SERVERLESS_KIT`.
+Dentro dele, você encontrará a pasta `api_template`. 
+
+Sua missão de implementação:
+1. Copie todo o conteúdo da pasta `_PIX_SERVERLESS_KIT/api_template` para dentro da pasta `api/` do meu frontend (se a pasta não existir, crie-a).
+2. Analise os arquivos em `api/_services`. Eles contêm a integração com o Firebase Admin (para gravar no banco `PAID`) e o Mercado Pago.
+3. Certifique-se de que o `package.json` do frontend possui as dependências necessárias: `firebase-admin`, `mercadopago`, `qrcode`, `web-push`, e `uuid`. Se não tiver, instale-as.
+4. Ajuste as rotas do frontend do novo projeto para baterem em `/api/pix/create-mp` para gerar a cobrança.
+5. Siga rigorosamente o AI_SAFE_WORKFLOW. Antes de fazer grandes alterações de código, faça um `git commit` de segurança. Se algo quebrar, não faça remendos: dê um `git reset --hard HEAD`, limpe e tente outra abordagem.
+
+Me avise quando tiver concluído a cópia dos arquivos e a configuração inicial!
+--- FIM DO PROMPT ---
