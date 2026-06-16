@@ -1,4 +1,5 @@
 const firebaseAdminService = require('../_services/firebaseAdminService');
+const oneSignalService = require('../_services/oneSignalService');
 const { FieldValue } = require('firebase-admin/firestore');
 
 module.exports = async (req, res) => {
@@ -37,12 +38,15 @@ module.exports = async (req, res) => {
 
     await batch.commit();
 
-    // Envia Notificação Push ao Admin
-    await firebaseAdminService.sendPushNotification(
-      '🎁 Reserva de Mimo!', 
-      `${customerName} reservou ${numbers.length} número(s) com Fralda + Mimo.`, 
-      'pagamento-confirmado' // reusing the nice sound
-    );
+    // Enviar Push via OneSignal
+    try {
+      await oneSignalService.sendNotification("mimo_reservado", { customerName });
+      console.log('Notificação Push OneSignal (MIMO) enviada com sucesso');
+    } catch (e) {
+      console.error('Erro ao enviar push OneSignal:', e);
+    }
+
+
 
     return res.status(200).json({ success: true });
   } catch (error) {

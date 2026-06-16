@@ -12,7 +12,7 @@ try {
       serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     } else {
       // Fallback para desenvolvimento local
-      serviceAccount = require('../../../backend/config/serviceAccountKey.json');
+      serviceAccount = require('./serviceAccountKey.json');
     }
 
     initializeApp({

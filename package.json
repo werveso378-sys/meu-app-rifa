@@ -7,6 +7,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "firebase-admin": "^12.7.0",
+    "jimp": "^0.16.13",
     "mercadopago": "^2.0.9",
     "web-push": "^3.6.7"
   }

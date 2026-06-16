@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 import com.example.data.TicketRepository
 import com.example.ui.AppScreen
 import com.example.ui.MainViewModel
@@ -51,7 +52,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         createNotificationChannels()
-        setupFCMToken()
+
+        // Inicializa o OneSignal Premium
+        val ONESIGNAL_APP_ID = "daf93ecb-9440-49fa-ab0a-f3c74f219f75"
+        com.onesignal.OneSignal.initWithContext(this, ONESIGNAL_APP_ID)
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            com.onesignal.OneSignal.Notifications.requestPermission(true)
+        }
 
         setContent {
             MyApplicationTheme {
@@ -179,22 +186,5 @@ class MainActivity : ComponentActivity() {
             .show()
     }
 
-    private fun setupFCMToken() {
-        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                return@addOnCompleteListener
-            }
-            val token = task.result
-            Log.d("MainActivity", "FCM Token no boot: $token")
-            
-            // Salva o token na Vercel
-            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                try {
-                    com.example.network.RetrofitClient.instance.updateToken(com.example.network.TokenRequest(token))
-                } catch (e: Exception) {
-                    Log.e("MainActivity", "Erro ao salvar token na Vercel no boot", e)
-                }
-            }
-        }
-    }
+
 }

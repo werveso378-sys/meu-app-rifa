@@ -1,5 +1,6 @@
 const mercadopagoService = require('../_services/mercadopagoService');
 const firebaseAdminService = require('../_services/firebaseAdminService');
+const oneSignalService = require('../_services/oneSignalService');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
@@ -44,14 +45,15 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      // Notificação Push
+      // Notificação Push OneSignal
       const name = paymentInfo.payer?.first_name || 'Cliente';
       const amount = (paymentInfo.transaction_amount || 0).toFixed(2).replace('.', ',');
-      await firebaseAdminService.sendPushNotification(
-        '💰 Pix Recebido!', 
-        `${name} pagou R$ ${amount}. Números confirmados!`, 
-        'pagamento-confirmado'
-      );
+      try {
+        await oneSignalService.sendNotification("pagamento_aprovado", { customerName: name, amount });
+        console.log('[Webhook MP] Notificação Push OneSignal enviada com sucesso');
+      } catch (e) {
+        console.error('[Webhook MP] Erro ao enviar push OneSignal:', e);
+      }
 
       // Automação WhatsApp (Disparo de recibo)
       const phoneRaw = paymentInfo.payer?.email?.split('@')[0] || '';

@@ -20,3 +20,5 @@ debug.keystore
 # Ignorar pastas de projetos locais e IA
 _MINHA_FABRICA_DE_APPS/
 .agents/
+api/_services/serviceAccountKey.json
+node_modules/

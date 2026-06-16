@@ -1,6 +1,7 @@
 
 const mercadopagoService = require('../_services/mercadopagoService');
 const firebaseAdminService = require('../_services/firebaseAdminService');
+const oneSignalService = require('../_services/oneSignalService');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -21,12 +22,12 @@ module.exports = async function handler(req, res) {
       await firebaseAdminService.updateNumberStatus(raffleId, num, 'PENDING_PAYMENT', txid, pixData.qr_code, customerName, customerPhone);
     }
 
-    // Envia Notificação Push ao Admin (se tiver FcmToken configurado)
-    await firebaseAdminService.sendPushNotification(
-      '🚨 Nova Reserva!', 
-      `${customerName} gerou um Pix para ${numbers.length} número(s).`, 
-      'pix-gerado'
-    );
+    // Envia Notificação Push OneSignal
+    try {
+      await oneSignalService.sendNotification("pix_gerado", { customerName });
+    } catch (e) {
+      console.error('Erro push:', e);
+    }
 
     res.status(200).json({ success: true, chargeId: txid, qrCode: qrCodeImage, payload: pixData.qr_code });
   } catch (error) {

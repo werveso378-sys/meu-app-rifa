@@ -1,4 +1,5 @@
 const firebaseAdminService = require('../_services/firebaseAdminService');
+const oneSignalService = require('../_services/oneSignalService');
 
 module.exports = async (req, res) => {
   // Configuração de CORS para permitir chamadas do frontend
@@ -19,12 +20,12 @@ module.exports = async (req, res) => {
   try {
     const { customerName, numbers } = req.body;
     
-    // Envia Notificação Push ao Admin
-    await firebaseAdminService.sendPushNotification(
-      '🎁 Reserva de Mimo!', 
-      `${customerName} reservou ${numbers.length} número(s) com Fralda + Mimo.`, 
-      'pagamento-confirmado' // reusing the nice sound
-    );
+    // Enviar Push via OneSignal
+    try {
+      await oneSignalService.sendNotification("dia_25", { customerName });
+    } catch (e) {
+      console.error('Erro push dia 25:', e);
+    }
 
     return res.status(200).json({ success: true });
   } catch (error) {
