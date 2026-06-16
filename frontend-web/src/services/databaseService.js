@@ -10,13 +10,19 @@ export const listenToSettings = (callback) => {
   const docRef = doc(db, "settings", "global");
   return onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
-      callback(docSnap.data());
+      const data = docSnap.data();
+      callback({
+        totalNumbers: Number(data.totalNumbers) || 100,
+        pixPrice: Number(data.pixPrice) || 40.0
+      });
     } else {
       callback({
         totalNumbers: 100,
         pixPrice: 40.0
       });
     }
+  }, (error) => {
+    console.error("Error fetching settings:", error);
   });
 };
 
@@ -33,5 +39,7 @@ export const listenToTickets = (callback) => {
       tickets.push({ id: docSnap.id, ...docSnap.data() });
     });
     callback(tickets);
+  }, (error) => {
+    console.error("Error fetching tickets:", error);
   });
 };

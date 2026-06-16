@@ -151,7 +151,7 @@ function App() {
           <div className="way-col">
             <img src="/anim_pix.png" alt="pix" className="anim-pix-icon" />
             <div className="way-title">2) PIX</div>
-            <div className="way-price">R${settings.pixPrice.toFixed(2)}</div>
+            <div className="way-price">R${(settings.pixPrice || 0).toFixed(2)}</div>
             <div className="way-desc">Cada número<br/>escolhido</div>
           </div>
         </div>
