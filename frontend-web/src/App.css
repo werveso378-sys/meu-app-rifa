@@ -7,7 +7,11 @@
   min-height: 100vh;
 }
 
-/* Animations */
+/* Hide Vercel Toolbar */
+vercel-live-feedback {
+  display: none !important;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-15px); }
@@ -279,17 +283,17 @@
 /* Instructions Section */
 .instructions-wrapper {
   width: 100%;
-  margin-top: 16px;
+  margin-top: 32px;
   position: relative;
 }
 
 .instructions-card {
   width: 100%;
-  margin-top: 14px;
+  margin-top: 0;
   border: 2px solid var(--gold);
   border-radius: 16px;
   background-color: white;
-  padding: 28px 12px 40px 12px;
+  padding: 32px 12px 40px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -300,7 +304,7 @@
   position: absolute;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   background-color: var(--dark-green);
   color: white;
   padding: 6px 16px;
@@ -308,6 +312,9 @@
   font-weight: 700;
   font-size: 14px;
   z-index: 2;
+  text-align: center;
+  width: max-content;
+  max-width: 90%;
 }
 
 .instructions-text {
@@ -353,11 +360,11 @@
 /* Two Ways Section */
 .two-ways-card {
   width: 100%;
-  margin-top: 14px;
+  margin-top: 0;
   border: 2px solid var(--gold);
   border-radius: 16px;
   background-color: white;
-  padding: 28px 16px 16px 16px;
+  padding: 40px 16px 16px 16px;
   display: flex;
   justify-content: space-evenly;
   align-items: center;

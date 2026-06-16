@@ -1,4 +1,3 @@
-const QRCode = require('qrcode');
 const mercadopagoService = require('../_services/mercadopagoService');
 const firebaseAdminService = require('../_services/firebaseAdminService');
 
@@ -12,8 +11,8 @@ module.exports = async function handler(req, res) {
     const pixData = await mercadopagoService.createPixPayment(value, customerName, customerPhone, raffleId, numbers);
     if (!pixData.success) return res.status(500).json({ success: false, error: 'Erro no Mercado Pago' });
     
-    // Gera QR Code
-    const qrCodeImage = await QRCode.toDataURL(pixData.qr_code, { errorCorrectionLevel: 'M', margin: 1 });
+    // O Mercado Pago já retorna o QR Code em base64 nativamente!
+    const qrCodeImage = `data:image/jpeg;base64,${pixData.qr_code_base64}`;
     const txid = String(pixData.id);
     
     // Atualiza Firebase para PENDING_PAYMENT
