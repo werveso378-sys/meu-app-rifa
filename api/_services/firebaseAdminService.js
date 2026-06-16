@@ -105,6 +105,9 @@ async function sendPushNotification(title, body, soundType = 'default') {
     }
 
     const message = {
+      android: {
+        priority: 'high'
+      },
       data: {
         title: title,
         body: body,

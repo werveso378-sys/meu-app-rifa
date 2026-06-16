@@ -50,13 +50,44 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        askNotificationPermission()
+        createNotificationChannels()
         setupFCMToken()
+
+        // Wait for window to attach before asking permission/showing dialogs
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            askNotificationPermission()
+        }
 
         setContent {
             MyApplicationTheme {
                 AppScreen(viewModel = viewModel)
             }
+        }
+    }
+
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            
+            // Canal Padrão
+            val channelDefault = android.app.NotificationChannel("rifas_vendas", "Vendas e Alertas", android.app.NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channelDefault)
+
+            // Canal Pix Gerado
+            val channelPix = android.app.NotificationChannel("pix_pendente", "Pix Gerado", android.app.NotificationManager.IMPORTANCE_HIGH).apply {
+                val soundUri = android.net.Uri.parse("android.resource://" + packageName + "/" + com.example.R.raw.som_pix_gerado)
+                val audioAttributes = android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION).build()
+                setSound(soundUri, audioAttributes)
+            }
+            notificationManager.createNotificationChannel(channelPix)
+
+            // Canal Venda Confirmada
+            val channelSale = android.app.NotificationChannel("venda_confirmada", "Venda Confirmada", android.app.NotificationManager.IMPORTANCE_HIGH).apply {
+                val soundUri = android.net.Uri.parse("android.resource://" + packageName + "/" + com.example.R.raw.som_venda_confirmada)
+                val audioAttributes = android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION).build()
+                setSound(soundUri, audioAttributes)
+            }
+            notificationManager.createNotificationChannel(channelSale)
         }
     }
 
