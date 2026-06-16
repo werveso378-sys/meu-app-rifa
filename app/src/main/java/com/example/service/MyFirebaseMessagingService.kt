@@ -47,29 +47,54 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = "rifas_vendas"
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+
+        // The channel to use
+        var targetChannelId = "rifas_vendas"
+        var targetSoundUri = defaultSoundUri
+
+        // Determine sound and channel based on title or logic, but FCM data payload handles this if properly sent
+        // However, if we're building the notification manually here:
+        if (title.contains("Pix", ignoreCase = true) || messageBody.contains("Pix", ignoreCase = true)) {
+            targetChannelId = "pix_pendente"
+            targetSoundUri = android.net.Uri.parse("android.resource://" + packageName + "/" + R.raw.som_pix_gerado)
+        } else if (title.contains("Confirmado", ignoreCase = true) || messageBody.contains("Confirmado", ignoreCase = true) || title.contains("Recebido", ignoreCase = true)) {
+            targetChannelId = "venda_confirmada"
+            targetSoundUri = android.net.Uri.parse("android.resource://" + packageName + "/" + R.raw.som_venda_confirmada)
+        }
+
+        // Cria os canais de notificação no Android 8.0+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Canal Padrão
+            val channelDefault = NotificationChannel("rifas_vendas", "Vendas e Alertas", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channelDefault)
+
+            // Canal Pix Gerado
+            val channelPix = NotificationChannel("pix_pendente", "Pix Gerado", NotificationManager.IMPORTANCE_HIGH).apply {
+                val soundUri = android.net.Uri.parse("android.resource://" + packageName + "/" + R.raw.som_pix_gerado)
+                val audioAttributes = android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION).build()
+                setSound(soundUri, audioAttributes)
+            }
+            notificationManager.createNotificationChannel(channelPix)
+
+            // Canal Venda Confirmada
+            val channelSale = NotificationChannel("venda_confirmada", "Venda Confirmada", NotificationManager.IMPORTANCE_HIGH).apply {
+                val soundUri = android.net.Uri.parse("android.resource://" + packageName + "/" + R.raw.som_venda_confirmada)
+                val audioAttributes = android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION).build()
+                setSound(soundUri, audioAttributes)
+            }
+            notificationManager.createNotificationChannel(channelSale)
+        }
+
+        val notificationBuilder = NotificationCompat.Builder(this, targetChannelId)
             .setSmallIcon(R.drawable.ic_stat_bear)
             .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)
-            .setSound(defaultSoundUri)
+            .setSound(targetSoundUri)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Cria o canal de notificação no Android 8.0+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Vendas e Alertas Pix",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
     }

@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
     
     // Atualiza Firebase para PENDING_PAYMENT
     for (const num of numbers) {
-      await firebaseAdminService.updateNumberStatus(raffleId, num, 'PENDING_PAYMENT', txid, pixData.qr_code);
+      await firebaseAdminService.updateNumberStatus(raffleId, num, 'PENDING_PAYMENT', txid, pixData.qr_code, customerName, customerPhone);
     }
 
     // Envia Notificação Push ao Admin (se tiver FcmToken configurado)

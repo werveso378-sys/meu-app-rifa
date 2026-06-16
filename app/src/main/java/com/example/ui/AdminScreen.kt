@@ -23,11 +23,14 @@ import com.example.data.AppSettings
 @Composable
 fun AdminScreen(
     settings: AppSettings,
-    onSaveSettings: (Double, Int) -> Unit,
+    onSaveSettings: (Double, Int, Boolean, Boolean, String) -> Unit,
     onResetRaffle: () -> Unit
 ) {
     var priceText by remember(settings.pixPrice) { mutableStateOf(settings.pixPrice.toString()) }
     var numbersText by remember(settings.totalNumbers) { mutableStateOf(settings.totalNumbers.toString()) }
+    var soundsEnabled by remember(settings.soundsEnabled) { mutableStateOf(settings.soundsEnabled) }
+    var popupActive by remember(settings.popupActive) { mutableStateOf(settings.popupActive) }
+    var popupMessage by remember(settings.popupMessage) { mutableStateOf(settings.popupMessage) }
     var showResetDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -75,11 +78,44 @@ fun AdminScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                Text("Sons e Experiência", fontWeight = FontWeight.Bold, color = Color(0xFF4C6A2B))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Sons de notificação e cliques", modifier = Modifier.weight(1f))
+                    Switch(checked = soundsEnabled, onCheckedChange = { soundsEnabled = it })
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text("Pop-up Promocional (Web)", fontWeight = FontWeight.Bold, color = Color(0xFF4C6A2B))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Ativar Pop-up Promocional", modifier = Modifier.weight(1f))
+                    Switch(checked = popupActive, onCheckedChange = { popupActive = it })
+                }
+                
+                if (popupActive) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = popupMessage,
+                        onValueChange = { popupMessage = it },
+                        label = { Text("Mensagem da Promoção") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
                 Button(
                     onClick = {
                         val p = priceText.toDoubleOrNull() ?: 40.0
                         val n = numbersText.toIntOrNull() ?: 100
-                        onSaveSettings(p, n)
+                        onSaveSettings(p, n, soundsEnabled, popupActive, popupMessage)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4C6A2B))

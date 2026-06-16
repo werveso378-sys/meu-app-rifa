@@ -86,13 +86,7 @@ fun AppScreen(viewModel: MainViewModel) {
                 )
             }
             composable(AppRoute.Numbers.name) {
-                NumbersScreen(
-                    tickets = tickets,
-                    settings = settings,
-                    onAssignSelected = { numbers, name, phone, type ->
-                        viewModel.assignTickets(numbers, name, phone, type)
-                    }
-                )
+                NumbersScreen()
             }
             composable(AppRoute.Participants.name) {
                 ParticipantsScreen(
@@ -123,8 +117,8 @@ fun AppScreen(viewModel: MainViewModel) {
             composable(AppRoute.Admin.name) {
                 AdminScreen(
                     settings = settings,
-                    onSaveSettings = { price, total ->
-                        viewModel.updateSettings(price, total)
+                    onSaveSettings = { price, total, sounds, popupActive, popupMessage ->
+                        viewModel.updateSettings(price, total, sounds, popupActive, popupMessage)
                     },
                     onResetRaffle = {
                         viewModel.resetRaffle()

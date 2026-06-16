@@ -21,6 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.core.content.FileProvider
+import java.io.File
+import java.io.FileOutputStream
 import com.example.R
 import com.example.data.Ticket
 
@@ -39,6 +45,8 @@ fun DashboardScreen(
     
     val paidCount = tickets.count { it.isPaid }
     val pendingCount = soldTickets - paidCount
+
+    var showShareOptions by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
@@ -99,23 +107,75 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.height(24.dp))
             val context = LocalContext.current
             Button(
-                onClick = {
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_SUBJECT, "Participe da Nossa Rifa!")
-                        putExtra(Intent.EXTRA_TEXT, "Compre seu número da rifa e concorra a prêmios incríveis!\nAcesse: https://meu-app-rifa.vercel.app")
-                    }
-                    context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Link da Rifa"))
-                },
+                onClick = { showShareOptions = true },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("🔗 Compartilhar Link da Rifa (Web)", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("🔗 Compartilhar Link da Rifa", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
+    }
+
+    if (showShareOptions) {
+        AlertDialog(
+            onDismissRequest = { showShareOptions = false },
+            title = { Text("Compartilhar Rifa") },
+            text = { Text("Como deseja enviar para seus contatos?") },
+            confirmButton = {
+                val context = LocalContext.current
+                Button(
+                    onClick = {
+                        showShareOptions = false
+                        shareWithImage(context)
+                    }
+                ) {
+                    Text("Compartilhar com Imagem \uD83D\uDDBC\uFE0F")
+                }
+            },
+            dismissButton = {
+                val context = LocalContext.current
+                OutlinedButton(
+                    onClick = {
+                        showShareOptions = false
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_SUBJECT, "Participe da Nossa Rifa!")
+                            putExtra(Intent.EXTRA_TEXT, "✨ Chá Rifa Baby!\n\nCompre seu número da rifa e concorra a prêmios incríveis!\nAcesse: https://meu-app-rifa.vercel.app")
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Link da Rifa"))
+                    }
+                ) {
+                    Text("Apenas o Link \uD83D\uDD17")
+                }
+            }
+        )
+    }
+}
+
+fun shareWithImage(context: Context) {
+    try {
+        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.cartaz_rifa)
+        val cachePath = File(context.cacheDir, "images")
+        cachePath.mkdirs()
+        val file = File(cachePath, "cartaz_rifa.png")
+        val fileOutputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+        fileOutputStream.close()
+
+        val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/png"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_TEXT, "✨ *Chá Rifa Baby!*\n\nCompre seu número da rifa e concorra a prêmios incríveis!\nAcesse o site para escolher seu número: https://meu-app-rifa.vercel.app")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(intent, "Compartilhar Rifa"))
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
 }
 

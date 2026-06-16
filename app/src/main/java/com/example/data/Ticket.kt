@@ -14,7 +14,10 @@ data class Ticket(
 data class AppSettings(
     val pixPrice: Double = 40.0,
     val totalNumbers: Int = 100,
-    val fcmToken: String? = null
+    val fcmToken: String? = null,
+    val soundsEnabled: Boolean = true,
+    val popupActive: Boolean = false,
+    val popupMessage: String = ""
 ) {
-    constructor() : this(40.0, 100, null)
+    constructor() : this(40.0, 100, null, true, false, "")
 }

@@ -84,9 +84,15 @@ class MainViewModel(private val repository: TicketRepository) : ViewModel() {
         assignTickets(numbers, ownerName, phone, paymentType)
     }
 
-    fun updateSettings(price: Double, numbers: Int) {
+    fun updateSettings(
+        price: Double, 
+        numbers: Int,
+        soundsEnabled: Boolean = true,
+        popupActive: Boolean = false,
+        popupMessage: String = ""
+    ) {
         viewModelScope.launch {
-            repository.updateSettings(price, numbers)
+            repository.updateSettings(price, numbers, soundsEnabled, popupActive, popupMessage)
             repository.insertInitialTicketsIfNeeded(numbers) // Adiciona novos tickets se o limite aumentou
         }
     }

@@ -29,7 +29,7 @@ try {
 /**
  * Atualiza o status de um número na Rifa (Usado quando gerar o Pix e quando pagar)
  */
-async function updateNumberStatus(raffleId, number, status, transactionId, pixPayload = null) {
+async function updateNumberStatus(raffleId, number, status, transactionId, pixPayload = null, customerName = null, customerPhone = null) {
   try {
     const docRef = db.collection('tickets').doc(String(number));
     
@@ -40,6 +40,8 @@ async function updateNumberStatus(raffleId, number, status, transactionId, pixPa
       updatedAt: FieldValue.serverTimestamp()
     };
     if (pixPayload) updateData.pixPayload = pixPayload;
+    if (customerName) updateData.ownerName = customerName;
+    if (customerPhone) updateData.phone = customerPhone;
 
     await docRef.set(updateData, { merge: true });
 
@@ -83,13 +85,24 @@ async function updateNumberStatusByTxid(raffleId, txid, newStatus) {
   }
 }
 
-async function sendPushNotification(title, body, sound = 'default') {
+async function sendPushNotification(title, body, soundType = 'default') {
   try {
     const settingsDoc = await db.collection('settings').doc('global').get();
     if (!settingsDoc.exists) return;
     
     const token = settingsDoc.data().fcmToken;
     if (!token) return;
+
+    let channelId = 'rifas_vendas';
+    let soundFile = 'default';
+    
+    if (soundType === 'pagamento-confirmado') {
+        channelId = 'venda_confirmada';
+        soundFile = 'som_venda_confirmada';
+    } else if (soundType === 'pix-gerado') {
+        channelId = 'pix_pendente';
+        soundFile = 'som_pix_gerado';
+    }
 
     const message = {
       notification: {
@@ -98,10 +111,10 @@ async function sendPushNotification(title, body, sound = 'default') {
       },
       android: {
         notification: {
-          sound: sound, // e.g. 'kaching'
-          channelId: 'rifas_vendas',
-          icon: 'ic_stat_name', // transparent silhouette icon
-          color: '#00E676'
+          sound: soundFile,
+          channelId: channelId,
+          icon: 'ic_stat_bear', // matching android manifest meta-data
+          color: '#4C6A2B'
         }
       },
       token: token

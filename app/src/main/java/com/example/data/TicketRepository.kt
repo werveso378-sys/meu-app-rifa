@@ -41,10 +41,19 @@ class TicketRepository(private val firestore: FirebaseFirestore) {
         awaitClose { listenerRegistration.remove() }
     }
 
-    suspend fun updateSettings(price: Double, numbers: Int) {
+    suspend fun updateSettings(
+        price: Double, 
+        numbers: Int,
+        soundsEnabled: Boolean = true,
+        popupActive: Boolean = false,
+        popupMessage: String = ""
+    ) {
         val updates = mapOf(
             "pixPrice" to price,
-            "totalNumbers" to numbers
+            "totalNumbers" to numbers,
+            "soundsEnabled" to soundsEnabled,
+            "popupActive" to popupActive,
+            "popupMessage" to popupMessage
         )
         settingsDoc.set(updates, SetOptions.merge()).await()
     }

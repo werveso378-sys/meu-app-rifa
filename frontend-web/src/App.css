@@ -33,6 +33,38 @@
   100% { transform: translateX(1000px); }
 }
 
+@keyframes twinkle {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+@keyframes rise {
+  0% { transform: translateY(100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+.stars-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-image: url('/anim_star_box.png');
+  background-size: cover;
+  animation: rise linear infinite, twinkle 3s ease-in-out infinite alternate;
+}
+
 /* Header Section */
 .header-section {
   width: 100%;
@@ -75,7 +107,7 @@
 .anim-crown {
   width: 30px;
   position: absolute;
-  top: -15px;
+  top: -8px; /* Baixou um pouco a coroa */
   left: 50%;
   margin-left: -15px;
   z-index: 11;
@@ -138,53 +170,63 @@
   width: 100%;
   justify-content: space-evenly;
   margin-top: 16px;
+  z-index: 5;
+  gap: 12px;
 }
 
 .prize-card {
-  width: 140px;
-  border: 2px solid var(--gold);
-  border-radius: 16px;
-  background-color: white;
-  padding: 12px;
+  width: 150px;
+  border: 2px solid #D5D7C2;
+  border-radius: 20px;
+  background-color: #F8F5EC;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .prize-header {
   display: flex;
   align-items: center;
   gap: 8px;
+  background-color: #E2E7D3;
+  width: 100%;
+  padding: 8px;
+  justify-content: center;
+  border-bottom: 2px solid #D5D7C2;
 }
 
 .prize-pos {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   background-color: var(--dark-green);
-  border-radius: 18px;
+  border-radius: 15px;
   color: white;
   font-weight: 700;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .prize-title {
-  color: var(--dark-green);
+  color: var(--text-brown);
   font-weight: 700;
   font-size: 12px;
 }
 
-.prize-value {
-  color: var(--dark-green);
+.prize-value-container {
+  background-color: var(--dark-green);
+  color: white;
+  width: 80%;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  margin: 12px 0 16px 0;
   font-weight: 900;
-  font-size: 24px;
-  margin: 8px 0;
-}
-
-.prize-emojis {
-  font-size: 24px;
+  font-size: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 /* Grid Section */
@@ -337,11 +379,11 @@
 }
 
 .anim-bag {
-  width: 50px;
+  width: 70px;
   position: absolute;
-  bottom: -10px;
-  left: -5px;
-  animation: float 1.2s infinite ease-in-out alternate;
+  bottom: 0px;
+  left: 5px;
+  animation: float 2.5s infinite alternate ease-in-out;
 }
 
 .anim-bear-sitting {
@@ -385,7 +427,7 @@
 
 .anim-pix-icon {
   width: 50px;
-  animation: float 1s infinite alternate;
+  animation: float 2.5s infinite alternate ease-in-out;
 }
 
 .way-title {

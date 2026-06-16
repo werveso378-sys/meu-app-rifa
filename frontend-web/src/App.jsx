@@ -8,6 +8,34 @@ function App() {
   const [settings, setSettings] = useState({ totalNumbers: 100, pixPrice: 40.0 });
   const [selectedNumbers, setSelectedNumbers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showPromoPopup, setShowPromoPopup] = useState(false);
+
+  const playClickSound = () => {
+    if (settings.soundsEnabled !== false) {
+      new Audio("https://actions.google.com/sounds/v1/ui/button_click.ogg").play().catch(()=>{});
+    }
+  };
+
+  const playNotificationSound = () => {
+    if (settings.soundsEnabled !== false) {
+      new Audio("https://actions.google.com/sounds/v1/alarms/bell_ring.ogg").play().catch(()=>{});
+    }
+  };
+
+  const playSuccessSound = () => {
+    if (settings.soundsEnabled !== false) {
+      new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_success_fanfare.ogg").play().catch(()=>{});
+    }
+  };
+
+  useEffect(() => {
+    if (settings.popupActive && settings.popupMessage) {
+      setShowPromoPopup(true);
+      playNotificationSound();
+    } else {
+      setShowPromoPopup(false);
+    }
+  }, [settings.popupActive, settings.popupMessage]);
 
   useEffect(() => {
     const unsubSettings = listenToSettings((data) => {
@@ -32,6 +60,7 @@ function App() {
     } else {
       setSelectedNumbers([...selectedNumbers, num]);
     }
+    playClickSound();
   };
 
   const handleConfirmAssignment = async (name, phone, type) => {
@@ -39,15 +68,31 @@ function App() {
     // Para doação ou pix agendado, a própria API que criará os registros no futuro, mas aqui no frontend basta fechar e aguardar.
     setShowModal(false);
     setSelectedNumbers([]);
+    playSuccessSound();
     alert("Pedido enviado! Obrigado por colaborar com a Chá Rifa Baby!");
   };
 
   return (
     <div className="app-container">
-      {/* Background Stars */}
-      <img src="/anim_star_1.png" style={{ position: 'absolute', top: '100px', left: '10%', width: '20px' }} alt="star" className="anim-star" />
-      <img src="/anim_star_2.png" style={{ position: 'absolute', top: '250px', right: '10%', width: '24px' }} alt="star" className="anim-star" />
-      <img src="/anim_star_4.png" style={{ position: 'absolute', top: '600px', left: '5%', width: '16px' }} alt="star" className="anim-star" />
+      {/* Background Stars CSS animation */}
+      <div className="stars-background">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div 
+            key={i} 
+            className="star" 
+            style={{ 
+              left: `${Math.random() * 100}%`, 
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${3 + Math.random() * 4}s` 
+            }} 
+          />
+        ))}
+      </div>
+
+      {/* Floating Image Stars */}
+      <img src="/anim_star_1.png" style={{ position: 'absolute', top: '100px', left: '10%', width: '20px', animation: 'twinkle 2s infinite alternate' }} alt="star" className="anim-star" />
+      <img src="/anim_star_2.png" style={{ position: 'absolute', top: '250px', right: '10%', width: '24px', animation: 'twinkle 3s infinite alternate' }} alt="star" className="anim-star" />
+      <img src="/anim_star_4.png" style={{ position: 'absolute', top: '600px', left: '5%', width: '16px', animation: 'twinkle 4s infinite alternate' }} alt="star" className="anim-star" />
 
       {/* Header Section */}
       <div className="header-section">
@@ -72,16 +117,20 @@ function App() {
             <div className="prize-pos">1º</div>
             <div className="prize-title">PRÊMIO</div>
           </div>
-          <div className="prize-value">R$150,00</div>
-          <div className="prize-emojis">🎁 🎉</div>
+          <div className="prize-value-container">R$150</div>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '18px' }}>🤎</span>
+          </div>
         </div>
         <div className="prize-card">
           <div className="prize-header">
             <div className="prize-pos">2º</div>
             <div className="prize-title">PRÊMIO</div>
           </div>
-          <div className="prize-value">R$100,00</div>
-          <div className="prize-emojis">🎁 🎉</div>
+          <div className="prize-value-container">R$100</div>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '18px' }}>🤎</span>
+          </div>
         </div>
       </div>
 
@@ -164,6 +213,20 @@ function App() {
           onDismiss={() => setShowModal(false)}
           onConfirm={handleConfirmAssignment}
         />
+      )}
+
+      {showPromoPopup && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ backgroundColor: '#F8F5EC', border: '2px solid #4C6A2B' }}>
+            <h3 className="modal-title" style={{ fontSize: '28px' }}>🎁 Promoção!</h3>
+            <p style={{ textAlign: 'center', fontSize: '16px', color: '#5A3E26', fontWeight: '500', marginBottom: '16px' }}>
+              {settings.popupMessage}
+            </p>
+            <button className="btn-primary" style={{ width: '100%' }} onClick={() => setShowPromoPopup(false)}>
+              Legal, entendi!
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
