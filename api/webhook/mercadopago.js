@@ -2,18 +2,15 @@ const mercadopagoService = require('../../_services/mercadopagoService');
 const firebaseAdminService = require('../../_services/firebaseAdminService');
 
 module.exports = async function handler(req, res) {
-  // O MP pode enviar requisições de teste que quebram o fluxo, vamos tentar envolver tudo em um try-catch geral.
-  res.status(200).send('OK');
-
-  if (req.method !== 'POST') return;
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
   try {
     const body = req.body;
     const isPaymentEvent = body.type === 'payment' || (body.action && String(body.action).includes('payment'));
-    if (!isPaymentEvent) return;
+    if (!isPaymentEvent) return res.status(200).send('Event Ignored');
 
     const paymentId = body.data?.id;
-    if (!paymentId) return;
+    if (!paymentId) return res.status(200).send('Missing ID');
 
     const paymentInfo = await mercadopagoService.getPaymentStatus(paymentId);
     console.log('[Webhook MP Serverless] Status:', paymentInfo?.status, '| Payer:', paymentInfo?.payer?.first_name);
@@ -56,7 +53,11 @@ module.exports = async function handler(req, res) {
         'pagamento-confirmado'
       );
     }
+    
+    // Retorna OK para o MP no final
+    return res.status(200).send('OK');
   } catch (error) {
     console.error('[Webhook MP Serverless] Erro:', error.message);
+    return res.status(500).send('Internal Server Error');
   }
 }
