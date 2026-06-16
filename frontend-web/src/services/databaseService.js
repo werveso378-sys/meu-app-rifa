@@ -69,4 +69,15 @@ export const reserveNumbersAsMimo = async (numbers, customerName, customerPhone)
 
   await batch.commit();
   console.log(`Reserva MIMO salva: ${customerName} - Números: ${numbers.join(', ')}`);
+
+  try {
+    // Chama a API da Vercel para disparar a notificação Push
+    await fetch('/api/mimo/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerName, numbers })
+    });
+  } catch (error) {
+    console.error("Erro ao notificar MIMO:", error);
+  }
 };

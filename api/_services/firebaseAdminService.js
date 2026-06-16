@@ -105,17 +105,10 @@ async function sendPushNotification(title, body, soundType = 'default') {
     }
 
     const message = {
-      notification: {
-        title,
-        body,
-      },
-      android: {
-        notification: {
-          sound: soundFile,
-          channelId: channelId,
-          icon: 'ic_stat_bear', // matching android manifest meta-data
-          color: '#4C6A2B'
-        }
+      data: {
+        title: title,
+        body: body,
+        soundType: soundType
       },
       token: token
     };

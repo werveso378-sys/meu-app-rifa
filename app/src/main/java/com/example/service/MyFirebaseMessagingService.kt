@@ -37,6 +37,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             Log.d("FCM", "Corpo da notificação: ${it.body}")
             sendNotification(it.title ?: "Nova Notificação", it.body ?: "")
         }
+
+        // Handle pure data payload (This fixes the background dropping issue)
+        if (remoteMessage.data.isNotEmpty()) {
+            Log.d("FCM", "Payload de dados: ${remoteMessage.data}")
+            val title = remoteMessage.data["title"] ?: "Nova Notificação"
+            val body = remoteMessage.data["body"] ?: ""
+            sendNotification(title, body)
+        }
     }
 
     private fun sendNotification(title: String, messageBody: String) {
