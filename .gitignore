@@ -16,3 +16,7 @@
 local.properties
 .env
 debug.keystore
+
+# Ignorar pastas de projetos locais e IA
+_MINHA_FABRICA_DE_APPS/
+.agents/
