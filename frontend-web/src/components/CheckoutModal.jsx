@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createPixPayment } from '../services/paymentService';
+import { createPixPayment, checkPaymentStatus } from '../services/paymentService';
 
 export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, onConfirm }) {
   const [step, setStep] = useState(1);
@@ -8,7 +8,9 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
   const [selectedType, setSelectedType] = useState(null);
   const [pixCodeGenerated, setPixCodeGenerated] = useState(null);
   const [qrCodeBase64, setQrCodeBase64] = useState(null);
+  const [chargeId, setChargeId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const totalPix = selectedNumbers.length * pixPrice;
 
@@ -37,10 +39,25 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
     if (result.success && result.payload) {
       setPixCodeGenerated(result.payload);
       setQrCodeBase64(result.qrCode);
+      setChargeId(result.chargeId);
     } else {
       setPixCodeGenerated(`Erro: ${result.error || 'Falha ao gerar PIX'}`);
     }
     setIsLoading(false);
+  };
+
+  const handleVerifyPayment = async () => {
+    if (!chargeId) return;
+    setIsVerifying(true);
+    const result = await checkPaymentStatus(chargeId);
+    setIsVerifying(false);
+
+    if (result && result.approved) {
+      alert("Pagamento confirmado com sucesso!");
+      onConfirm(name, phone, 'PIX'); // Conclui e fecha o modal
+    } else {
+      alert("Desculpe, o pagamento ainda não foi identificado. Por favor, certifique-se de que o pagamento foi concluído e tente novamente em alguns instantes.");
+    }
   };
 
   return (
@@ -75,7 +92,13 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
 
           {step === 2 && (
             <>
-              <p><strong>Olá, {name}!</strong></p>
+              <h4 style={{ textAlign: 'center', color: '#4C6A2B', marginBottom: '8px' }}>Verifique seus dados</h4>
+              <div style={{ backgroundColor: '#FBF9F1', padding: '12px', borderRadius: '12px', fontSize: '14px', marginBottom: '16px' }}>
+                <p style={{ margin: '4px 0' }}><strong>Nome:</strong> {name}</p>
+                <p style={{ margin: '4px 0' }}><strong>WhatsApp:</strong> {phone}</p>
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Certifique-se de que o WhatsApp está correto, pois será usado para contato caso você seja o ganhador!</p>
+              </div>
+
               <p>Você escolheu os números:</p>
               <div style={{ backgroundColor: '#FBF9F1', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
                 <strong style={{ color: '#4C6A2B', fontSize: '20px' }}>
@@ -136,8 +159,8 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
                       Copiar
                     </button>
                   </div>
-                  <button className="btn-primary" style={{ width: '100%', marginTop: '16px' }} onClick={() => onConfirm(name, phone, 'PIX')}>
-                    JÁ PAGUEI / CONCLUIR
+                  <button className="btn-primary" style={{ width: '100%', marginTop: '16px' }} onClick={handleVerifyPayment} disabled={isVerifying}>
+                    {isVerifying ? "VERIFICANDO..." : "VERIFICAR PAGAMENTO"}
                   </button>
                 </div>
               ) : (

@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      // Notificação
+      // Notificação Push
       const name = paymentInfo.payer?.first_name || 'Cliente';
       const amount = (paymentInfo.transaction_amount || 0).toFixed(2).replace('.', ',');
       await firebaseAdminService.sendPushNotification(
@@ -52,6 +52,25 @@ module.exports = async function handler(req, res) {
         `${name} pagou R$ ${amount}. Números confirmados!`, 
         'pagamento-confirmado'
       );
+
+      // Automação WhatsApp (Disparo de recibo)
+      const phoneRaw = paymentInfo.payer?.email?.split('@')[0] || '';
+      if (phoneRaw && phoneRaw.length >= 10) {
+        const phoneFormatted = phoneRaw.startsWith('55') ? phoneRaw : `55${phoneRaw}`;
+        const whatsappMessage = `Olá ${name}! Seu pagamento de R$ ${amount} foi confirmado e seus números da Chá Rifa Baby estão garantidos! Obrigado pela colaboração 🎉`;
+        
+        try {
+          // TODO: Substitua a URL abaixo pela sua API real de WhatsApp (Ex: Z-API, Evolution, CallMeBot)
+          // await fetch('https://sua-api-whatsapp.com/send-message', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({ phone: phoneFormatted, message: whatsappMessage })
+          // });
+          console.log(`[Webhook MP] 🟢 WhatsApp PRONTO para enviar para ${phoneFormatted}: ${whatsappMessage}`);
+        } catch (err) {
+          console.error('[Webhook MP] Erro ao enviar WhatsApp:', err.message);
+        }
+      }
     }
     
     // Retorna OK para o MP no final

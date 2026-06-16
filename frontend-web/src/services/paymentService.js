@@ -30,3 +30,17 @@ export const createPixPayment = async (data) => {
     return { success: false, error: error.message };
   }
 };
+
+export const checkPaymentStatus = async (paymentId) => {
+  try {
+    const baseUrl = window.location.hostname === "localhost" 
+      ? "https://meu-app-rifa.vercel.app" 
+      : "";
+    const response = await fetch(`${baseUrl}/api/pix/check/${paymentId}`);
+    if (!response.ok) throw new Error("Erro na rede ou servidor");
+    return await response.json();
+  } catch (error) {
+    console.error("Erro ao verificar pagamento:", error);
+    return { status: 'error', error: error.message };
+  }
+};
