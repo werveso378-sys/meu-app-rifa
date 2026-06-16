@@ -1,4 +1,5 @@
 const { getApps } = require('firebase-admin/app');
+require('../_services/firebaseAdminService');
 
 module.exports = async (req, res) => {
   const apps = getApps();
