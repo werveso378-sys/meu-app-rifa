@@ -21,9 +21,9 @@ module.exports = async (req, res) => {
     
     // Envia Notificação Push ao Admin
     await firebaseAdminService.sendPushNotification(
-      '📅 Reserva para o Dia 25!', 
-      `${customerName} reservou ${numbers.length} número(s) para pagar dia 25.`, 
-      'pagamento-confirmado'
+      '🎁 Reserva de Mimo!', 
+      `${customerName} reservou ${numbers.length} número(s) com Fralda + Mimo.`, 
+      'pagamento-confirmado' // reusing the nice sound
     );
 
     return res.status(200).json({ success: true });

@@ -180,18 +180,21 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupFCMToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
             }
             val token = task.result
             Log.d("MainActivity", "FCM Token no boot: $token")
-            val db = FirebaseFirestore.getInstance()
-            val data = hashMapOf("fcmToken" to token)
-            db.collection("settings").document("global")
-                .set(data, SetOptions.merge())
-                .addOnSuccessListener { Log.d("FCM", "Token salvo no boot com sucesso") }
+            
+            // Salva o token na Vercel
+            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    com.example.network.RetrofitClient.instance.updateToken(com.example.network.TokenRequest(token))
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Erro ao salvar token na Vercel no boot", e)
+                }
+            }
         }
     }
 }

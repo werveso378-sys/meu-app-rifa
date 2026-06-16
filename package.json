@@ -5,9 +5,9 @@
     "start": "node api/index.js"
   },
   "dependencies": {
-    "firebase-admin": "^12.1.0",
+    "cors": "^2.8.5",
+    "firebase-admin": "^12.7.0",
     "mercadopago": "^2.0.9",
-    "web-push": "^3.6.7",
-    "cors": "^2.8.5"
+    "web-push": "^3.6.7"
   }
 }

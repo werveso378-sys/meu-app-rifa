@@ -21,12 +21,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onNewToken(token)
         Log.d("FCM", "Novo token recebido: $token")
         
-        // Salva o token no Firestore para que a Vercel possa enviar a notificação para este aparelho
-        val db = FirebaseFirestore.getInstance()
-        db.collection("settings").document("global")
-            .update("fcmToken", token)
-            .addOnSuccessListener { Log.d("FCM", "Token atualizado no Firestore com sucesso") }
-            .addOnFailureListener { e -> Log.w("FCM", "Erro ao atualizar token no Firestore", e) }
+        // Salva o token na Vercel para ignorar bloqueios do Firestore Security Rules
+        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                com.example.network.RetrofitClient.instance.updateToken(com.example.network.TokenRequest(token))
+                Log.d("FCM", "Token atualizado via Vercel com sucesso")
+            } catch (e: Exception) {
+                Log.w("FCM", "Erro ao atualizar token na Vercel", e)
+            }
+        }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {

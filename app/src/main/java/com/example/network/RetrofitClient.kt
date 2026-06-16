@@ -21,9 +21,20 @@ data class PixResponse(
     val error: String?
 )
 
+data class TokenRequest(
+    val token: String
+)
+
+data class TokenResponse(
+    val success: Boolean
+)
+
 interface PixApiService {
     @POST("/api/pix/create-mp")
     suspend fun createPix(@Body request: PixRequest): PixResponse
+
+    @POST("/api/push/token")
+    suspend fun updateToken(@Body request: TokenRequest): TokenResponse
 }
 
 object RetrofitClient {

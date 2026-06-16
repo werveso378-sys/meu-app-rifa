@@ -54,65 +54,19 @@ export const listenToTickets = (callback) => {
  * @param {string} customerPhone - WhatsApp do comprador.
  */
 export const reserveNumbersAsMimo = async (numbers, customerName, customerPhone) => {
-  const batch = writeBatch(db);
-  
-  for (const num of numbers) {
-    const docRef = doc(db, "tickets", String(num));
-    batch.set(docRef, {
-      number: num,
-      ownerName: customerName,
-      phone: customerPhone,
-      paymentType: "MIMO",
-      isPaid: false,
-    }, { merge: true });
-  }
-
-  await batch.commit();
-  console.log(`Reserva MIMO salva: ${customerName} - Números: ${numbers.join(', ')}`);
-
   try {
-    // Chama a API da Vercel para disparar a notificação Push
-    await fetch('/api/mimo/notify', {
+    const response = await fetch('https://meu-app-rifa.vercel.app/api/mimo/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customerName, numbers })
+      body: JSON.stringify({ customerName, customerPhone, numbers })
     });
+    
+    if (!response.ok) {
+      throw new Error(`Erro na API: ${response.status}`);
+    }
+    
+    console.log(`Reserva MIMO salva com sucesso via Vercel: ${customerName} - Números: ${numbers.join(', ')}`);
   } catch (error) {
-    console.error("Erro ao notificar MIMO:", error);
-  }
-};
-
-/**
- * Reserva números para Dia 25 diretamente no Firestore e dispara push notification.
- * @param {number[]} numbers - Lista de números selecionados.
- * @param {string} customerName - Nome do comprador.
- * @param {string} customerPhone - WhatsApp do comprador.
- */
-export const reserveNumbersAsDia25 = async (numbers, customerName, customerPhone) => {
-  const batch = writeBatch(db);
-  
-  for (const num of numbers) {
-    const docRef = doc(db, "tickets", String(num));
-    batch.set(docRef, {
-      number: num,
-      ownerName: customerName,
-      phone: customerPhone,
-      paymentType: "DIA25",
-      isPaid: false,
-    }, { merge: true });
-  }
-
-  await batch.commit();
-  console.log(`Reserva Dia 25 salva: ${customerName} - Números: ${numbers.join(', ')}`);
-
-  try {
-    // Chama a API da Vercel para disparar a notificação Push
-    await fetch('/api/dia25/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customerName, numbers })
-    });
-  } catch (error) {
-    console.error("Erro ao notificar Dia 25:", error);
+    console.error("Erro ao salvar MIMO via Vercel:", error);
   }
 };
