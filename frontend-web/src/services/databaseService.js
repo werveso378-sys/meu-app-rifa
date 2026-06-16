@@ -81,3 +81,38 @@ export const reserveNumbersAsMimo = async (numbers, customerName, customerPhone)
     console.error("Erro ao notificar MIMO:", error);
   }
 };
+
+/**
+ * Reserva números para Dia 25 diretamente no Firestore e dispara push notification.
+ * @param {number[]} numbers - Lista de números selecionados.
+ * @param {string} customerName - Nome do comprador.
+ * @param {string} customerPhone - WhatsApp do comprador.
+ */
+export const reserveNumbersAsDia25 = async (numbers, customerName, customerPhone) => {
+  const batch = writeBatch(db);
+  
+  for (const num of numbers) {
+    const docRef = doc(db, "tickets", String(num));
+    batch.set(docRef, {
+      number: num,
+      ownerName: customerName,
+      phone: customerPhone,
+      paymentType: "DIA25",
+      isPaid: false,
+    }, { merge: true });
+  }
+
+  await batch.commit();
+  console.log(`Reserva Dia 25 salva: ${customerName} - Números: ${numbers.join(', ')}`);
+
+  try {
+    // Chama a API da Vercel para disparar a notificação Push
+    await fetch('/api/dia25/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerName, numbers })
+    });
+  } catch (error) {
+    console.error("Erro ao notificar Dia 25:", error);
+  }
+};

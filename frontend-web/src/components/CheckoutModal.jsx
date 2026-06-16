@@ -236,7 +236,7 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
                 <div style={{ textAlign: 'center' }}>
                   <p className="step-subtitle">Prefere pagar agora ou agendar para o dia 25 de Julho?</p>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                    <button className="btn-outline" style={{ flex: 1 }} onClick={() => onConfirm(name, phone, 'PIX')}>
+                    <button className="btn-outline" style={{ flex: 1 }} onClick={() => onConfirm(name, phone, 'DIA25')}>
                       📅 Dia 25
                     </button>
                     <button className="btn-primary" style={{ flex: 1 }} onClick={generatePix} disabled={isLoading}>

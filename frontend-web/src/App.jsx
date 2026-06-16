@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { listenToSettings, listenToTickets } from './services/databaseService';
-import { reserveNumbersAsMimo } from './services/databaseService';
+import { reserveNumbersAsMimo, reserveNumbersAsDia25 } from './services/databaseService';
 import CheckoutModal from './components/CheckoutModal';
 import './App.css';
 
@@ -71,6 +71,9 @@ function App() {
       if (type === 'MIMO') {
         // Salva os números com MIMO no Firebase
         await reserveNumbersAsMimo(selectedNumbers, name, phone);
+      } else if (type === 'DIA25') {
+        // Salva os números como DIA25 no Firebase
+        await reserveNumbersAsDia25(selectedNumbers, name, phone);
       }
       // Para PIX, os números já foram salvos pela API create-mp.js
       setShowModal(false);
