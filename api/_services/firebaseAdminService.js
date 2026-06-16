@@ -7,17 +7,16 @@ let db;
 try {
   // Em Serverless, os apps são cacheados e não devem ser reinicializados a cada request
   if (!getApps().length) {
-    let serviceAccount;
+    let serviceAccount = null;
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      initializeApp({
+        credential: cert(serviceAccount)
+      });
     } else {
-      // Fallback para desenvolvimento local
-      serviceAccount = require('./serviceAccountKey.json');
+      console.warn('Aviso: FIREBASE_SERVICE_ACCOUNT não está definido.');
+      initializeApp(); // Inicialização padrão do Firebase
     }
-
-    initializeApp({
-      credential: cert(serviceAccount)
-    });
   }
   
   db = getFirestore();
