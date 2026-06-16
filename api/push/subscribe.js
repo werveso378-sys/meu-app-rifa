@@ -6,7 +6,7 @@ const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || 'LWg0Cq5ycqYL6zJcF6-fYJqK
 
 webpush.setVapidDetails('mailto:admin@rifababygo.com', VAPID_PUBLIC, VAPID_PRIVATE);
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {

@@ -1,8 +1,8 @@
 const mercadopagoService = require('../../_services/mercadopagoService');
 const firebaseAdminService = require('../../_services/firebaseAdminService');
 
-export default async function handler(req, res) {
-  // Responde rápido para o MP não ficar dando timeout e re-enviando
+module.exports = async function handler(req, res) {
+  // O MP pode enviar requisições de teste que quebram o fluxo, vamos tentar envolver tudo em um try-catch geral.
   res.status(200).send('OK');
 
   if (req.method !== 'POST') return;

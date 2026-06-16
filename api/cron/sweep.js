@@ -1,6 +1,6 @@
 const firebaseAdminService = require('../../_services/firebaseAdminService');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Aceita GET ou POST para ser facilmente pingado pelo UptimeRobot
   try {
     const db = firebaseAdminService.db;
