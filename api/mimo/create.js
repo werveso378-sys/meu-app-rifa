@@ -30,6 +30,7 @@ module.exports = async (req, res) => {
         phone: customerPhone,
         paymentType: "MIMO",
         isPaid: false,
+        status: "sim",
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
     }

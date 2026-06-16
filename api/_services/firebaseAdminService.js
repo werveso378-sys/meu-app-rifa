@@ -35,6 +35,7 @@ async function updateNumberStatus(raffleId, number, status, transactionId, pixPa
     
     const updateData = {
       isPaid: status === 'PAID',
+      status: status === 'PAID' ? 'pago' : 'pendente',
       paymentType: 'PIX',
       transactionId: transactionId,
       updatedAt: FieldValue.serverTimestamp()
@@ -71,6 +72,7 @@ async function updateNumberStatusByTxid(raffleId, txid, newStatus) {
     snapshot.docs.forEach((doc) => {
       batch.update(doc.ref, { 
         isPaid: newStatus === 'PAID',
+        status: newStatus === 'PAID' ? 'pago' : 'pendente',
         paidAt: FieldValue.serverTimestamp()
       });
     });
