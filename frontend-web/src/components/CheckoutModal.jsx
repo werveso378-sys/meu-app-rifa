@@ -112,7 +112,30 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
                     <div className="qr-box" style={{ backgroundColor: '#ccc' }}>QR Code</div>
                   )}
                   <p style={{ fontSize: '12px', marginTop: '16px' }}>Ou copie o código PIX Copia e Cola:</p>
-                  <input type="text" readOnly value={pixCodeGenerated} className="pix-code-input" />
+                  <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={pixCodeGenerated} 
+                      className="pix-code-input" 
+                      onClick={() => {
+                        navigator.clipboard.writeText(pixCodeGenerated);
+                        alert('Código PIX copiado!');
+                      }}
+                      title="Clique para copiar"
+                      style={{ cursor: 'pointer', flex: 1 }}
+                    />
+                    <button 
+                      className="btn-primary" 
+                      style={{ padding: '0 16px', borderRadius: '12px' }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(pixCodeGenerated);
+                        alert('Código PIX copiado!');
+                      }}
+                    >
+                      Copiar
+                    </button>
+                  </div>
                   <button className="btn-primary" style={{ width: '100%', marginTop: '16px' }} onClick={() => onConfirm(name, phone, 'PIX')}>
                     JÁ PAGUEI / CONCLUIR
                   </button>
