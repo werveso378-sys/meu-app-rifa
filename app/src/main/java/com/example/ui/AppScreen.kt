@@ -34,6 +34,25 @@ fun AppScreen(viewModel: MainViewModel) {
     val tickets by viewModel.tickets.collectAsState()
     val settings by viewModel.appSettings.collectAsState()
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? android.app.Activity
+
+    LaunchedEffect(Unit) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU && activity != null) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            }
+        }
+    }
+
     Scaffold(
         // topBar removed to allow full screen image
         bottomBar = {

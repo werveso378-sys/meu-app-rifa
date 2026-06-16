@@ -53,11 +53,6 @@ class MainActivity : ComponentActivity() {
         createNotificationChannels()
         setupFCMToken()
 
-        // Wait for window to attach before asking permission/showing dialogs
-        android.os.Handler(android.os.Looper.getMainLooper()).post {
-            askNotificationPermission()
-        }
-
         setContent {
             MyApplicationTheme {
                 AppScreen(viewModel = viewModel)
