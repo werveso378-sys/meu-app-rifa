@@ -1,10 +1,15 @@
 package com.example.data
 
+import com.google.firebase.firestore.PropertyName
+
 data class Ticket(
     val number: Int = 0,
     var ownerName: String? = null,
     var phone: String? = null,
     var paymentType: String? = null, // "PIX", "MIMO", etc
+    
+    @get:PropertyName("isPaid")
+    @set:PropertyName("isPaid")
     var isPaid: Boolean = false
 ) {
     // Empty constructor for Firestore

@@ -62,12 +62,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Check again on resume in case user came back from settings
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                // Still not granted, show explanation
-                showNotificationExplanationDialog()
-            }
+        checkNotificationStatus()
+    }
+
+    private fun checkNotificationStatus() {
+        val areEnabled = androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
+        if (!areEnabled) {
+            showNotificationExplanationDialog()
         }
     }
 
@@ -75,11 +76,20 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                checkNotificationStatus()
             }
+        } else {
+            checkNotificationStatus()
         }
     }
 
+    private var dialogShown = false
+
     private fun showNotificationExplanationDialog() {
+        if (dialogShown) return
+        dialogShown = true
+
         AlertDialog.Builder(this)
             .setTitle("🔔 Notificações são essenciais!")
             .setMessage(
@@ -91,12 +101,14 @@ class MainActivity : ComponentActivity() {
                 "Deseja ativar agora?"
             )
             .setPositiveButton("Ativar nas Configurações") { _, _ ->
+                dialogShown = false
                 val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                     putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
                 }
                 startActivity(intent)
             }
             .setNegativeButton("Depois") { dialog, _ ->
+                dialogShown = false
                 dialog.dismiss()
                 Toast.makeText(this, "⚠️ Você não receberá alertas de vendas!", Toast.LENGTH_LONG).show()
             }
