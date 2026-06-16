@@ -608,3 +608,193 @@
   font-size: 12px;
   text-align: center;
 }
+
+/* Step Indicator */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  background-color: var(--dark-green);
+  transform: scale(1.2);
+}
+
+/* Review Card */
+.review-card {
+  background: linear-gradient(135deg, #F8F5EC, #E8E4D8);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #D5D7C2;
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.review-label {
+  font-size: 13px;
+  color: #888;
+  font-weight: 600;
+}
+
+.review-value {
+  font-size: 14px;
+  color: #5A3E26;
+  font-weight: 700;
+}
+
+.review-divider {
+  height: 1px;
+  background-color: #D5D7C2;
+}
+
+.numbers-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.number-chip {
+  background: linear-gradient(135deg, var(--dark-green), #7CA64A);
+  color: white;
+  font-weight: 800;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(76, 106, 43, 0.3);
+}
+
+.review-warning {
+  background-color: #FFF8E1;
+  border: 1px solid #FFD54F;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #7B6B2E;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Inline Toast Notifications */
+.inline-toast {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+.inline-toast.success {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #A5D6A7;
+}
+
+.inline-toast.error {
+  background-color: #FFF3E0;
+  color: #BF360C;
+  border: 1px solid #FFAB91;
+}
+
+.inline-toast.info {
+  background-color: #E3F2FD;
+  color: #1565C0;
+  border: 1px solid #90CAF9;
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark-green);
+  margin-left: 4px;
+}
+
+/* Step Subtitle */
+.step-subtitle {
+  text-align: center;
+  color: #5A3E26;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Payment Card Text */
+.payment-card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-desc {
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* QR Label */
+.qr-label {
+  font-weight: bold;
+  color: var(--dark-green);
+}
+
+.pix-copy-label {
+  font-size: 12px;
+  margin-top: 16px;
+  color: #666;
+}
+
+/* Outline Button */
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--dark-green);
+  border-radius: 25px;
+  color: var(--dark-green);
+  font-weight: 700;
+  padding: 10px 24px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-outline:hover {
+  background-color: rgba(76, 106, 43, 0.1);
+}
+
+/* QR Box white bg */
+.qr-box {
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #E2E7D3;
+}

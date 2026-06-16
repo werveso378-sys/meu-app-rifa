@@ -11,6 +11,8 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
   const [chargeId, setChargeId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [inlineMessage, setInlineMessage] = useState(null); // { text, type: 'success' | 'error' | 'info' }
+  const [copied, setCopied] = useState(false);
 
   const totalPix = selectedNumbers.length * pixPrice;
 
@@ -28,6 +30,7 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
 
   const generatePix = async () => {
     setIsLoading(true);
+    setInlineMessage(null);
     const result = await createPixPayment({
       raffleId: "1",
       customerName: name,
@@ -41,83 +44,140 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
       setQrCodeBase64(result.qrCode);
       setChargeId(result.chargeId);
     } else {
-      setPixCodeGenerated(`Erro: ${result.error || 'Falha ao gerar PIX'}`);
+      setInlineMessage({ text: `Erro ao gerar PIX: ${result.error || 'Falha desconhecida'}`, type: 'error' });
     }
     setIsLoading(false);
+  };
+
+  const handleCopyPix = () => {
+    if (pixCodeGenerated) {
+      navigator.clipboard.writeText(pixCodeGenerated).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      }).catch(() => {
+        // Fallback for WebView
+        const textArea = document.createElement('textarea');
+        textArea.value = pixCodeGenerated;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      });
+    }
   };
 
   const handleVerifyPayment = async () => {
     if (!chargeId) return;
     setIsVerifying(true);
+    setInlineMessage(null);
     const result = await checkPaymentStatus(chargeId);
     setIsVerifying(false);
 
     if (result && result.approved) {
-      alert("Pagamento confirmado com sucesso!");
-      onConfirm(name, phone, 'PIX'); // Conclui e fecha o modal
+      setInlineMessage({ text: 'Pagamento confirmado com sucesso! 🎉', type: 'success' });
+      setTimeout(() => {
+        onConfirm(name, phone, 'PIX');
+      }, 1500);
     } else {
-      alert("Desculpe, o pagamento ainda não foi identificado. Por favor, certifique-se de que o pagamento foi concluído e tente novamente em alguns instantes.");
+      setInlineMessage({ 
+        text: 'O pagamento ainda não foi identificado. Certifique-se de que o pagamento foi concluído e tente novamente em alguns instantes.', 
+        type: 'error' 
+      });
     }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
+        {/* Step Indicator */}
+        <div className="step-indicator">
+          {[1, 2, 3, 4].map(s => (
+            <div key={s} className={`step-dot ${step >= s ? 'active' : ''}`} />
+          ))}
+        </div>
+
         <h3 className="modal-title">
-          {step === 1 && "Seus Dados"}
-          {step === 2 && "Revisão dos Números"}
-          {step === 3 && "Forma de Colaboração"}
-          {step === 4 && (selectedType === 'PIX' ? "Pagamento PIX" : "Sucesso!")}
+          {step === 1 && "📝 Seus Dados"}
+          {step === 2 && "🔍 Revisão"}
+          {step === 3 && "🎁 Forma de Colaboração"}
+          {step === 4 && (selectedType === 'PIX' ? "💸 Pagamento PIX" : "🧸 Reserva Confirmada!")}
         </h3>
 
         <div className="modal-body">
           {step === 1 && (
             <>
-              <input 
-                type="text" 
-                className="form-input" 
-                placeholder="Nome Completo" 
-                value={name} 
-                onChange={e => setName(e.target.value)} 
-              />
-              <input 
-                type="tel" 
-                className="form-input" 
-                placeholder="WhatsApp (com DDD)" 
-                value={phone} 
-                onChange={handlePhoneChange} 
-              />
+              <div className="form-group">
+                <label className="form-label">Nome Completo</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="Digite seu nome completo" 
+                  value={name} 
+                  onChange={e => setName(e.target.value)} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">WhatsApp (com DDD)</label>
+                <input 
+                  type="tel" 
+                  className="form-input" 
+                  placeholder="(00) 00000-0000" 
+                  value={phone} 
+                  onChange={handlePhoneChange} 
+                />
+              </div>
             </>
           )}
 
           {step === 2 && (
             <>
-              <h4 style={{ textAlign: 'center', color: '#4C6A2B', marginBottom: '8px' }}>Verifique seus dados</h4>
-              <div style={{ backgroundColor: '#FBF9F1', padding: '12px', borderRadius: '12px', fontSize: '14px', marginBottom: '16px' }}>
-                <p style={{ margin: '4px 0' }}><strong>Nome:</strong> {name}</p>
-                <p style={{ margin: '4px 0' }}><strong>WhatsApp:</strong> {phone}</p>
-                <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Certifique-se de que o WhatsApp está correto, pois será usado para contato caso você seja o ganhador!</p>
+              <div className="review-card">
+                <div className="review-item">
+                  <span className="review-label">👤 Nome</span>
+                  <span className="review-value">{name}</span>
+                </div>
+                <div className="review-divider" />
+                <div className="review-item">
+                  <span className="review-label">📱 WhatsApp</span>
+                  <span className="review-value">{phone}</span>
+                </div>
+                <div className="review-divider" />
+                <div className="review-item">
+                  <span className="review-label">🎯 Números</span>
+                  <span className="review-value">{selectedNumbers.length} selecionado(s)</span>
+                </div>
               </div>
 
-              <p>Você escolheu os números:</p>
-              <div style={{ backgroundColor: '#FBF9F1', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-                <strong style={{ color: '#4C6A2B', fontSize: '20px' }}>
-                  {selectedNumbers.join(', ')}
-                </strong>
+              <div className="numbers-preview">
+                {selectedNumbers.sort((a,b) => a - b).map(n => (
+                  <div key={n} className="number-chip">{n}</div>
+                ))}
               </div>
+
+              <p className="review-warning">
+                ⚠️ Certifique-se de que o WhatsApp está correto, pois será usado para contato caso você seja o ganhador!
+              </p>
             </>
           )}
 
           {step === 3 && (
             <>
-              <p>Como você prefere contribuir?</p>
+              <p className="step-subtitle">Como você prefere contribuir?</p>
               <div className={`payment-card ${selectedType === 'MIMO' ? 'active' : ''}`} onClick={() => { setSelectedType('MIMO'); setStep(4); }}>
                 <span className="emoji">🎁</span>
-                <span className="text">DOAR FRALDA + MIMO</span>
+                <div className="payment-card-text">
+                  <span className="text">DOAR FRALDA + MIMO</span>
+                  <span className="payment-desc">Entrega no dia 25 de julho</span>
+                </div>
               </div>
               <div className={`payment-card ${selectedType === 'PIX' ? 'active' : ''}`} onClick={() => { setSelectedType('PIX'); setStep(4); }}>
                 <span className="emoji">💸</span>
-                <span className="text">PIX (R${totalPix.toFixed(2)})</span>
+                <div className="payment-card-text">
+                  <span className="text">PIX (R${totalPix.toFixed(2)})</span>
+                  <span className="payment-desc">Pagamento instantâneo</span>
+                </div>
               </div>
             </>
           )}
@@ -126,7 +186,7 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
             <>
               {pixCodeGenerated ? (
                 <div className="qr-container">
-                  <span style={{ fontWeight: 'bold', color: '#4C6A2B' }}>Escaneie o QR Code</span>
+                  <span className="qr-label">Escaneie o QR Code</span>
                   {qrCodeBase64 ? (
                     <div className="qr-box">
                       <img src={qrCodeBase64} alt="QR Code" />
@@ -134,46 +194,61 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
                   ) : (
                     <div className="qr-box" style={{ backgroundColor: '#ccc' }}>QR Code</div>
                   )}
-                  <p style={{ fontSize: '12px', marginTop: '16px' }}>Ou copie o código PIX Copia e Cola:</p>
+                  <p className="pix-copy-label">Ou copie o código PIX Copia e Cola:</p>
                   <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
                     <input 
                       type="text" 
                       readOnly 
                       value={pixCodeGenerated} 
                       className="pix-code-input" 
-                      onClick={() => {
-                        navigator.clipboard.writeText(pixCodeGenerated);
-                        alert('Código PIX copiado!');
-                      }}
+                      onClick={handleCopyPix}
                       title="Clique para copiar"
                       style={{ cursor: 'pointer', flex: 1 }}
                     />
                     <button 
                       className="btn-primary" 
                       style={{ padding: '0 16px', borderRadius: '12px' }}
-                      onClick={() => {
-                        navigator.clipboard.writeText(pixCodeGenerated);
-                        alert('Código PIX copiado!');
-                      }}
+                      onClick={handleCopyPix}
                     >
-                      Copiar
+                      {copied ? '✅' : 'Copiar'}
                     </button>
                   </div>
+
+                  {/* Inline feedback for copy */}
+                  {copied && (
+                    <div className="inline-toast success">
+                      ✅ Código PIX copiado!
+                    </div>
+                  )}
+
                   <button className="btn-primary" style={{ width: '100%', marginTop: '16px' }} onClick={handleVerifyPayment} disabled={isVerifying}>
-                    {isVerifying ? "VERIFICANDO..." : "VERIFICAR PAGAMENTO"}
+                    {isVerifying ? "VERIFICANDO..." : "🔍 VERIFICAR PAGAMENTO"}
                   </button>
+
+                  {/* Inline message */}
+                  {inlineMessage && (
+                    <div className={`inline-toast ${inlineMessage.type}`}>
+                      {inlineMessage.text}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div style={{ textAlign: 'center' }}>
-                  <p>Prefere pagar agora ou agendar para o dia 25 de Julho?</p>
+                  <p className="step-subtitle">Prefere pagar agora ou agendar para o dia 25 de Julho?</p>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                    <button className="btn-cancel" style={{ border: '1px solid #4C6A2B', borderRadius: '25px', flex: 1, color: '#4C6A2B' }} onClick={() => onConfirm(name, phone, 'PIX')}>
-                      Dia 25
+                    <button className="btn-outline" style={{ flex: 1 }} onClick={() => onConfirm(name, phone, 'PIX')}>
+                      📅 Dia 25
                     </button>
                     <button className="btn-primary" style={{ flex: 1 }} onClick={generatePix} disabled={isLoading}>
-                      {isLoading ? "Aguarde..." : "Agora"}
+                      {isLoading ? "Aguarde..." : "💸 Agora"}
                     </button>
                   </div>
+
+                  {inlineMessage && (
+                    <div className={`inline-toast ${inlineMessage.type}`}>
+                      {inlineMessage.text}
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -181,9 +256,10 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
 
           {step === 4 && selectedType === 'MIMO' && (
             <div style={{ textAlign: 'center' }}>
-              <p>Tudo certo! Seus números foram reservados para a Fralda + Mimo.</p>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🧸</div>
+              <p className="step-subtitle">Tudo certo! Seus números foram reservados para a Fralda + Mimo.</p>
               <button className="btn-primary" style={{ width: '100%', marginTop: '16px' }} onClick={() => onConfirm(name, phone, 'MIMO')}>
-                FINALIZAR RESERVA
+                ✅ FINALIZAR RESERVA
               </button>
             </div>
           )}
@@ -191,7 +267,7 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
 
         <div className="modal-actions">
           <button className="btn-cancel" onClick={() => { if (step > 1) setStep(step - 1); else onDismiss(); }}>
-            {step > 1 ? "Voltar" : "Cancelar"}
+            {step > 1 ? "← Voltar" : "Cancelar"}
           </button>
           {step < 3 && (
             <button 
@@ -199,7 +275,7 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
               disabled={step === 1 && (!name || phone.replace(/\D/g, '').length < 11)}
               onClick={() => setStep(step + 1)}
             >
-              Avançar
+              Avançar →
             </button>
           )}
         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { listenToSettings, listenToTickets } from './services/databaseService';
+import { reserveNumbersAsMimo } from './services/databaseService';
 import CheckoutModal from './components/CheckoutModal';
 import './App.css';
 
@@ -9,6 +10,8 @@ function App() {
   const [selectedNumbers, setSelectedNumbers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showPromoPopup, setShowPromoPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const playClickSound = () => {
     if (settings.soundsEnabled !== false) {
@@ -64,12 +67,26 @@ function App() {
   };
 
   const handleConfirmAssignment = async (name, phone, type) => {
-    // Apenas chamamos o mock do CheckoutModal (a API já reserva no db se o QR Code for gerado, ou o admin aprova).
-    // Para doação ou pix agendado, a própria API que criará os registros no futuro, mas aqui no frontend basta fechar e aguardar.
-    setShowModal(false);
-    setSelectedNumbers([]);
-    playSuccessSound();
-    alert("Pedido enviado! Obrigado por colaborar com a Chá Rifa Baby!");
+    try {
+      if (type === 'MIMO') {
+        // Salva os números com MIMO no Firebase
+        await reserveNumbersAsMimo(selectedNumbers, name, phone);
+      }
+      // Para PIX, os números já foram salvos pela API create-mp.js
+      setShowModal(false);
+      setSelectedNumbers([]);
+      playSuccessSound();
+      setSuccessMessage(
+        type === 'MIMO' 
+          ? `Seus números foram reservados com sucesso!\nObrigado por colaborar com a Chá Rifa Baby! 🧸`
+          : `Obrigado por colaborar com a Chá Rifa Baby! 🧸`
+      );
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error('Erro ao salvar reserva:', error);
+      setSuccessMessage('Ocorreu um erro ao salvar sua reserva. Tente novamente.');
+      setShowSuccessPopup(true);
+    }
   };
 
   return (
@@ -119,7 +136,7 @@ function App() {
           </div>
           <div className="prize-value-container">R$150</div>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '18px' }}>🤎</span>
+            <span style={{ fontSize: '18px' }}>🏆</span>
           </div>
         </div>
         <div className="prize-card">
@@ -129,7 +146,7 @@ function App() {
           </div>
           <div className="prize-value-container">R$100</div>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '18px' }}>🤎</span>
+            <span style={{ fontSize: '18px' }}>🎁</span>
           </div>
         </div>
       </div>
@@ -224,6 +241,22 @@ function App() {
             </p>
             <button className="btn-primary" style={{ width: '100%' }} onClick={() => setShowPromoPopup(false)}>
               Legal, entendi!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pop-up de Sucesso estilizado */}
+      {showSuccessPopup && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ backgroundColor: '#F8F5EC', border: '2px solid #4C6A2B', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '12px' }}>🧸</div>
+            <h3 className="modal-title" style={{ fontSize: '22px' }}>Tudo Certo!</h3>
+            <p style={{ fontSize: '15px', color: '#5A3E26', fontWeight: '500', marginBottom: '20px', whiteSpace: 'pre-line' }}>
+              {successMessage}
+            </p>
+            <button className="btn-primary" style={{ width: '100%' }} onClick={() => setShowSuccessPopup(false)}>
+              Fechar
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { collection, doc, onSnapshot, writeBatch } from "firebase/firestore";
 import { db } from "./firebase";
 
 /**
@@ -13,7 +13,10 @@ export const listenToSettings = (callback) => {
       const data = docSnap.data();
       callback({
         totalNumbers: Number(data.totalNumbers) || 100,
-        pixPrice: Number(data.pixPrice) || 40.0
+        pixPrice: Number(data.pixPrice) || 40.0,
+        soundsEnabled: data.soundsEnabled,
+        popupActive: data.popupActive,
+        popupMessage: data.popupMessage || ''
       });
     } else {
       callback({
@@ -42,4 +45,28 @@ export const listenToTickets = (callback) => {
   }, (error) => {
     console.error("Error fetching tickets:", error);
   });
+};
+
+/**
+ * Reserva números como MIMO (Fralda + Mimo) diretamente no Firestore.
+ * @param {number[]} numbers - Lista de números selecionados.
+ * @param {string} customerName - Nome do comprador.
+ * @param {string} customerPhone - WhatsApp do comprador.
+ */
+export const reserveNumbersAsMimo = async (numbers, customerName, customerPhone) => {
+  const batch = writeBatch(db);
+  
+  for (const num of numbers) {
+    const docRef = doc(db, "tickets", String(num));
+    batch.set(docRef, {
+      number: num,
+      ownerName: customerName,
+      phone: customerPhone,
+      paymentType: "MIMO",
+      isPaid: false,
+    }, { merge: true });
+  }
+
+  await batch.commit();
+  console.log(`Reserva MIMO salva: ${customerName} - Números: ${numbers.join(', ')}`);
 };

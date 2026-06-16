@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -160,17 +162,32 @@ fun shareWithImage(context: Context) {
         val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.cartaz_rifa)
         val cachePath = File(context.cacheDir, "images")
         cachePath.mkdirs()
-        val file = File(cachePath, "cartaz_rifa.png")
+        val file = File(cachePath, "cartaz_rifa.jpg")
         val fileOutputStream = FileOutputStream(file)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fileOutputStream)
         fileOutputStream.close()
 
         val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
 
+        val shareText = """
+🧸✨ *Chá Rifa Baby!* ✨🧸
+
+🎁 Concorra a prêmios incríveis!
+🏆 1º Prêmio: R$150
+🎁 2º Prêmio: R$100
+
+Cada número vale 1 pacote de fralda + mimo!
+
+👉 Escolha seu número agora:
+https://meu-app-rifa.vercel.app
+
+Sua participação faz toda a diferença! 💚
+        """.trimIndent()
+
         val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "image/png"
+            type = "image/jpeg"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_TEXT, "✨ *Chá Rifa Baby!*\n\nCompre seu número da rifa e concorra a prêmios incríveis!\nAcesse o site para escolher seu número: https://meu-app-rifa.vercel.app")
+            putExtra(Intent.EXTRA_TEXT, shareText)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(Intent.createChooser(intent, "Compartilhar Rifa"))

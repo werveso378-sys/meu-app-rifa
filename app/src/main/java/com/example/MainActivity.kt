@@ -1,6 +1,7 @@
 package com.example
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,8 +13,12 @@ import com.example.ui.MainViewModel
 import com.example.ui.MainViewModelFactory
 import com.example.ui.theme.MyApplicationTheme
 import android.Manifest
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -27,8 +32,11 @@ class MainActivity : ComponentActivity() {
     ) { isGranted: Boolean ->
         if (isGranted) {
             Log.d("MainActivity", "Permissão de notificação concedida")
+            Toast.makeText(this, "🔔 Notificações ativadas com sucesso!", Toast.LENGTH_SHORT).show()
         } else {
             Log.d("MainActivity", "Permissão de notificação negada")
+            // Show dialog explaining why notifications are important
+            showNotificationExplanationDialog()
         }
     }
 
@@ -52,12 +60,48 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Check again on resume in case user came back from settings
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Still not granted, show explanation
+                showNotificationExplanationDialog()
+            }
+        }
+    }
+
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    private fun showNotificationExplanationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("🔔 Notificações são essenciais!")
+            .setMessage(
+                "Para acompanhar as vendas da sua Chá Rifa Baby em tempo real, é obrigatório ativar as notificações.\n\n" +
+                "Você será notificado quando:\n" +
+                "• Um Pix for gerado 💸\n" +
+                "• Um pagamento for confirmado 💰\n" +
+                "• Uma reserva de mimo for feita 🎁\n\n" +
+                "Deseja ativar agora?"
+            )
+            .setPositiveButton("Ativar nas Configurações") { _, _ ->
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("Depois") { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(this, "⚠️ Você não receberá alertas de vendas!", Toast.LENGTH_LONG).show()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun setupFCMToken() {
@@ -76,4 +120,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
