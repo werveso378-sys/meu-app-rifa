@@ -1,7 +1,7 @@
 // O fetch global já é nativo no Node.js 18+ da Vercel. Não precisamos de dependência externa.
 
-const APP_ID = process.env.ONESIGNAL_APP_ID || "daf93ecb-9440-49fa-ab0a-f3c74f219f75";
-const REST_API_KEY = process.env.ONESIGNAL_REST_API_KEY || "os_v2_app_3l4t5s4uibe7vkyk6pdu6im7ox7zmcqj3xhu2dny3ry2mqgfqe2ex7t2iit7qldmhgar5sv3t7qwo42y4qbi2giydhrlj57mpzgho3y";
+const APP_ID = process.env.ONESIGNAL_APP_ID || "f9df7575-906c-421e-a8ab-41b1964e526a";
+const REST_API_KEY = process.env.ONESIGNAL_REST_API_KEY || "os_v2_app_7hpxk5mqnrbb5kfligyzmtssnj2ow2alhf4uunm6le4xdhqa4nk6c3feuahijaytsivlkmvmqm54whf3qb4mqbmkcitzpulmqgzn7dq";
 
 /**
  * Envia notificação OneSignal

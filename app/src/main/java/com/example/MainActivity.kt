@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         createNotificationChannels()
 
         // Inicializa o OneSignal Premium
-        val ONESIGNAL_APP_ID = "daf93ecb-9440-49fa-ab0a-f3c74f219f75"
+        val ONESIGNAL_APP_ID = "f9df7575-906c-421e-a8ab-41b1964e526a"
         com.onesignal.OneSignal.initWithContext(this, ONESIGNAL_APP_ID)
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             com.onesignal.OneSignal.Notifications.requestPermission(true)
