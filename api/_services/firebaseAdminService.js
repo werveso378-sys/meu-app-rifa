@@ -43,6 +43,12 @@ async function updateNumberStatus(raffleId, number, status, transactionId, pixPa
     if (customerName) updateData.ownerName = customerName;
     if (customerPhone) updateData.phone = customerPhone;
 
+    if (status !== 'PAID') {
+        const expiresDate = new Date();
+        expiresDate.setMinutes(expiresDate.getMinutes() + 5);
+        updateData.expiresAt = expiresDate.toISOString();
+    }
+
     await docRef.set(updateData, { merge: true });
 
     console.log(`Sucesso: Número ${number} atualizado para status ${status}`);

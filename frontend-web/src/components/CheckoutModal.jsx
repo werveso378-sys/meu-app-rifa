@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPixPayment, checkPaymentStatus } from '../services/paymentService';
 
 export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, onConfirm }) {
@@ -13,6 +13,25 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
   const [isVerifying, setIsVerifying] = useState(false);
   const [inlineMessage, setInlineMessage] = useState(null); // { text, type: 'success' | 'error' | 'info' }
   const [copied, setCopied] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+
+  useEffect(() => {
+    let interval;
+    if (pixCodeGenerated && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && pixCodeGenerated) {
+      setInlineMessage({ text: 'Tempo expirado! O QR Code do PIX foi cancelado e os números liberados.', type: 'error' });
+    }
+    return () => clearInterval(interval);
+  }, [pixCodeGenerated, timeLeft]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   const totalPix = selectedNumbers.length * pixPrice;
 
@@ -187,6 +206,9 @@ export default function CheckoutModal({ selectedNumbers, pixPrice, onDismiss, on
               {pixCodeGenerated ? (
                 <div className="qr-container">
                   <span className="qr-label">Escaneie o QR Code</span>
+                  <div style={{ color: timeLeft > 0 ? '#e63946' : '#999', fontWeight: 'bold', fontSize: '24px', margin: '8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    ⏳ {formatTime(timeLeft)}
+                  </div>
                   {qrCodeBase64 ? (
                     <div className="qr-box">
                       <img src={qrCodeBase64} alt="QR Code" />

@@ -48,8 +48,9 @@ module.exports = async function handler(req, res) {
       // Notificação Push OneSignal
       const name = paymentInfo.payer?.first_name || 'Cliente';
       const amount = (paymentInfo.transaction_amount || 0).toFixed(2).replace('.', ',');
+      const quantity = (ref && ref.numbers) ? ref.numbers.length : 1;
       try {
-        await oneSignalService.sendNotification("pagamento_aprovado", { customerName: name, amount });
+        await oneSignalService.sendNotification("pagamento_aprovado", { customerName: name, amount, quantity });
         console.log('[Webhook MP] Notificação Push OneSignal enviada com sucesso');
       } catch (e) {
         console.error('[Webhook MP] Erro ao enviar push OneSignal:', e);

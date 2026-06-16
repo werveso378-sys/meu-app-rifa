@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
 
     // Envia Notificação Push OneSignal
     try {
-      await oneSignalService.sendNotification("pix_gerado", { customerName });
+      await oneSignalService.sendNotification("pix_gerado", { customerName, amount: value, quantity: numbers.length });
     } catch (e) {
       console.error('Erro push:', e);
     }

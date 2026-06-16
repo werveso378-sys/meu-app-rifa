@@ -7,8 +7,8 @@ module.exports = async function handler(req, res) {
     if (!db) return res.status(500).json({ error: 'DB not initialized' });
 
     const now = new Date().toISOString();
-    const snapshot = await db.collectionGroup('numbers')
-      .where('status', 'in', ['RESERVED', 'PENDING_PAYMENT'])
+    const snapshot = await db.collectionGroup('tickets')
+      .where('status', 'in', ['pendente', 'RESERVED', 'PENDING_PAYMENT'])
       .where('expiresAt', '<', now)
       .get();
       
