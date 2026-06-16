@@ -1,5 +1,5 @@
-const mercadopagoService = require('../../_services/mercadopagoService');
-const firebaseAdminService = require('../../_services/firebaseAdminService');
+const mercadopagoService = require('../_services/mercadopagoService');
+const firebaseAdminService = require('../_services/firebaseAdminService');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
