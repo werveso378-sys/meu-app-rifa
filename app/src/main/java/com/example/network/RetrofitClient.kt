@@ -7,16 +7,17 @@ import retrofit2.http.POST
 
 data class PixRequest(
     val raffleId: String,
-    val name: String,
-    val email: String,
+    val customerName: String,
+    val customerPhone: String,
+    val value: Double,
     val numbers: List<Int>
 )
 
 data class PixResponse(
     val success: Boolean,
-    val qr_code: String?,
-    val qr_code_base64: String?,
-    val ticket_url: String?,
+    val chargeId: String?,
+    val qrCode: String?,
+    val payload: String?,
     val error: String?
 )
 
@@ -26,8 +27,8 @@ interface PixApiService {
 }
 
 object RetrofitClient {
-    // ATENÇÃO: Substitua essa URL pela URL oficial gerada pela Vercel após o deploy do projeto!
-    private const val BASE_URL = "https://rifababy-api.vercel.app"
+    // URL oficial gerada pela Vercel após o deploy do projeto
+    private const val BASE_URL = "https://meu-app-rifa.vercel.app"
 
     val instance: PixApiService by lazy {
         Retrofit.Builder()

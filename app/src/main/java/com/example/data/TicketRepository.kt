@@ -1,6 +1,7 @@
 package com.example.data
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.tasks.await
 
 class TicketRepository(private val firestore: FirebaseFirestore) {
     private val ticketsCollection = firestore.collection("tickets")
+    private val settingsDoc = firestore.collection("settings").document("global")
 
     val allTickets: Flow<List<Ticket>> = callbackFlow {
         val listenerRegistration = ticketsCollection.addSnapshotListener { snapshot, error ->
@@ -23,12 +25,44 @@ class TicketRepository(private val firestore: FirebaseFirestore) {
         awaitClose { listenerRegistration.remove() }
     }
 
-    suspend fun insertInitialTicketsIfNeeded() {
-        // Inicialização de 100 números se a coleção estiver vazia
+    val settingsFlow: Flow<AppSettings> = callbackFlow {
+        val listenerRegistration = settingsDoc.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                val settings = snapshot.toObject(AppSettings::class.java) ?: AppSettings()
+                trySend(settings).isSuccess
+            } else {
+                trySend(AppSettings()).isSuccess
+            }
+        }
+        awaitClose { listenerRegistration.remove() }
+    }
+
+    suspend fun updateSettings(price: Double, numbers: Int) {
+        val updates = mapOf(
+            "pixPrice" to price,
+            "totalNumbers" to numbers
+        )
+        settingsDoc.set(updates, SetOptions.merge()).await()
+    }
+
+    suspend fun resetRaffle() {
+        val snapshot = ticketsCollection.get().await()
+        val batch = firestore.batch()
+        snapshot.documents.forEach { doc ->
+            batch.delete(doc.reference)
+        }
+        batch.commit().await()
+    }
+
+    suspend fun insertInitialTicketsIfNeeded(totalNumbers: Int = 100) {
         val snapshot = ticketsCollection.limit(1).get().await()
         if (snapshot.isEmpty) {
             val batch = firestore.batch()
-            for (i in 1..100) {
+            for (i in 1..totalNumbers) {
                 val ticketRef = ticketsCollection.document(i.toString())
                 batch.set(ticketRef, Ticket(number = i))
             }
@@ -37,7 +71,6 @@ class TicketRepository(private val firestore: FirebaseFirestore) {
     }
 
     suspend fun insertTickets(tickets: List<Ticket>) {
-        // Não precisamos de insertTickets massivo depois do initial
     }
 
     suspend fun updateTicket(ticket: Ticket) {

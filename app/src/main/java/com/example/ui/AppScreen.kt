@@ -20,7 +20,8 @@ import com.example.data.Ticket
 enum class AppRoute {
     Dashboard,
     Numbers,
-    Participants
+    Participants,
+    Admin
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +32,7 @@ fun AppScreen(viewModel: MainViewModel) {
     val currentRoute = navBackStackEntry?.destination?.route ?: AppRoute.Dashboard.name
     
     val tickets by viewModel.tickets.collectAsState()
+    val settings by viewModel.appSettings.collectAsState()
 
     Scaffold(
         // topBar removed to allow full screen image
@@ -78,11 +80,15 @@ fun AppScreen(viewModel: MainViewModel) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(AppRoute.Dashboard.name) {
-                DashboardScreen(tickets = tickets)
+                DashboardScreen(
+                    tickets = tickets,
+                    onAdminClick = { navController.navigate(AppRoute.Admin.name) }
+                )
             }
             composable(AppRoute.Numbers.name) {
                 NumbersScreen(
                     tickets = tickets,
+                    settings = settings,
                     onAssignSelected = { numbers, name, phone, type ->
                         viewModel.assignTickets(numbers, name, phone, type)
                     }
@@ -111,6 +117,17 @@ fun AppScreen(viewModel: MainViewModel) {
                             val phone = existingTicket?.phone ?: ""
                             viewModel.addNumbersToParticipant(numbersToAdd, ownerName, phone, type)
                         }
+                    }
+                )
+            }
+            composable(AppRoute.Admin.name) {
+                AdminScreen(
+                    settings = settings,
+                    onSaveSettings = { price, total ->
+                        viewModel.updateSettings(price, total)
+                    },
+                    onResetRaffle = {
+                        viewModel.resetRaffle()
                     }
                 )
             }

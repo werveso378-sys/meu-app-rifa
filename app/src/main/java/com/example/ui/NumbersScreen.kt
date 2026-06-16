@@ -47,6 +47,7 @@ val LightGreen = Color(0xFF637442)
 @Composable
 fun NumbersScreen(
     tickets: List<Ticket>,
+    settings: com.example.data.AppSettings,
     onAssignSelected: (List<Int>, String, String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -72,7 +73,7 @@ fun NumbersScreen(
             Spacer(modifier = Modifier.height(8.dp))
             NumbersPrizesSection()
             Spacer(modifier = Modifier.height(8.dp))
-            NumbersGridContent(tickets, selectedNumbers) { num ->
+            NumbersGridContent(tickets, selectedNumbers, settings.totalNumbers) { num ->
                 if (selectedNumbers.contains(num)) {
                     selectedNumbers = selectedNumbers - num
                 } else {
@@ -146,7 +147,7 @@ fun NumbersScreen(
             Spacer(modifier = Modifier.height(16.dp))
             NumbersInstructionsSection()
             Spacer(modifier = Modifier.height(16.dp))
-            NumbersTwoWaysSection()
+            NumbersTwoWaysSection(settings.pixPrice)
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -154,6 +155,7 @@ fun NumbersScreen(
     if (showDialog) {
         AssignDialog(
             selectedNumbers = selectedNumbers.toList().sorted(),
+            pixPrice = settings.pixPrice,
             onDismiss = { showDialog = false },
             onConfirm = { name, phone, type ->
                 onAssignSelected(selectedNumbers.toList(), name, phone, type)
@@ -341,7 +343,8 @@ private fun NumbersPrizeCard(pos: String, value: String) {
 }
 
 @Composable
-private fun NumbersGridContent(tickets: List<Ticket>, selectedNumbers: Set<Int>, onNumberClick: (Int) -> Unit) {
+private fun NumbersGridContent(tickets: List<Ticket>, selectedNumbers: Set<Int>, totalNumbers: Int, onNumberClick: (Int) -> Unit) {
+    val numRows = (totalNumbers + 9) / 10
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -350,13 +353,17 @@ private fun NumbersGridContent(tickets: List<Ticket>, selectedNumbers: Set<Int>,
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        for (row in 0 until 10) {
+        for (row in 0 until numRows) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 for (col in 0 until 10) {
                     val num = row * 10 + col + 1
+                    if (num > totalNumbers) {
+                        Spacer(modifier = Modifier.weight(1f).aspectRatio(1f).padding(2.dp))
+                        continue
+                    }
                     val ticket = tickets.find { it.number == num }
                     val isSelected = selectedNumbers.contains(num)
                     val isAssigned = ticket?.ownerName != null
@@ -419,7 +426,7 @@ private fun NumbersInstructionsSection() {
                 .padding(top = 14.dp)
                 .border(2.dp, Color(0xFFD6DDBE), RoundedCornerShape(16.dp))
                 .background(Color.White, RoundedCornerShape(16.dp))
-                .padding(top = 28.dp, bottom = 80.dp, start = 16.dp, end = 16.dp)
+                .padding(top = 28.dp, bottom = 40.dp, start = 12.dp, end = 12.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
@@ -444,9 +451,9 @@ private fun NumbersInstructionsSection() {
                 painter = painterResource(id = R.drawable.anim_bag),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(50.dp)
                     .align(Alignment.BottomStart)
-                    .offset(x = (-25).dp, y = (10 + bagAnim).dp)
+                    .offset(x = (-10).dp, y = (20 + bagAnim).dp)
             )
             
             // Sitting Bear
@@ -454,7 +461,7 @@ private fun NumbersInstructionsSection() {
                 painter = painterResource(id = R.drawable.anim_bear_sitting),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(70.dp)
+                    .size(60.dp)
                     .align(Alignment.BottomEnd)
                     .offset(x = 10.dp, y = 20.dp)
                     .graphicsLayer { scaleX = bearBreathe; scaleY = bearBreathe }
@@ -474,7 +481,7 @@ private fun NumbersInstructionsSection() {
 }
 
 @Composable
-private fun NumbersTwoWaysSection() {
+private fun NumbersTwoWaysSection(pixPrice: Double) {
     val infiniteTransition = rememberInfiniteTransition()
     
     // Diaper Animation (Fralda) - rotation
@@ -515,9 +522,9 @@ private fun NumbersTwoWaysSection() {
                             .graphicsLayer { rotationZ = diaperAnim }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("1) DOAR", fontWeight = FontWeight.Bold, color = Color(0xFF5A3E26))
+                    Text("1) DOAR", fontWeight = FontWeight.Bold, color = Color(0xFF5A3E26), fontSize = 14.sp)
                     Box(modifier = Modifier.background(DarkGreen, RoundedCornerShape(4.dp)).padding(horizontal = 4.dp, vertical = 2.dp)) {
-                        Text("FRALDA + MIMO", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("FRALDA+MIMO", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Cada número =\n1 pacote de fralda\n+ 1 mimo", textAlign = TextAlign.Center, fontSize = 10.sp, color = Color.Gray)
@@ -534,8 +541,9 @@ private fun NumbersTwoWaysSection() {
                             .offset(y = pixAnim.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("2) PIX", fontWeight = FontWeight.Bold, color = Color(0xFF5A3E26))
-                    Text("R$40,00", fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+                    Text("2) PIX", fontWeight = FontWeight.Bold, color = Color(0xFF5A3E26), fontSize = 14.sp)
+                    val formattedPrice = String.format("R$%.2f", pixPrice)
+                    Text(formattedPrice, fontWeight = FontWeight.ExtraBold, color = DarkGreen, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Cada número\nescolhido", textAlign = TextAlign.Center, fontSize = 10.sp, color = Color.Gray)
                 }
@@ -558,6 +566,7 @@ private fun NumbersTwoWaysSection() {
 @Composable
 private fun AssignDialog(
     selectedNumbers: List<Int>,
+    pixPrice: Double,
     onDismiss: () -> Unit,
     onConfirm: (String, String, String) -> Unit
 ) {
@@ -575,6 +584,8 @@ private fun AssignDialog(
         initialValue = 1f, targetValue = 1.02f,
         animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse)
     )
+
+    val totalPix = selectedNumbers.size * pixPrice
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -639,12 +650,13 @@ private fun AssignDialog(
                         }
                     }
                     3 -> {
+                        val formattedTotal = String.format("R$%.2f", totalPix)
                         Text("Como você prefere contribuir?", fontWeight = FontWeight.Medium)
                         OutlinedCard(onClick = { selectedType = "MIMO"; step = 4 }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.outlinedCardColors(containerColor = if (selectedType == "MIMO") Color(0xFFE9E5D3) else Color.Transparent)) {
                             Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text("🎁", fontSize = 28.sp); Spacer(modifier = Modifier.width(16.dp)); Text("DOAR FRALDA + MIMO", fontWeight = FontWeight.Bold, color = DarkGreen) }
                         }
                         OutlinedCard(onClick = { selectedType = "PIX"; step = 4 }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.outlinedCardColors(containerColor = if (selectedType == "PIX") Color(0xFFE9E5D3) else Color.Transparent)) {
-                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text("💸", fontSize = 28.sp); Spacer(modifier = Modifier.width(16.dp)); Text("PIX (R$40,00)", fontWeight = FontWeight.Bold, color = DarkGreen) }
+                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Text("💸", fontSize = 28.sp); Spacer(modifier = Modifier.width(16.dp)); Text("PIX ($formattedTotal)", fontWeight = FontWeight.Bold, color = DarkGreen) }
                         }
                     }
                     4 -> {
@@ -664,7 +676,7 @@ private fun AssignDialog(
                                           val bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                                           if (bitmap != null) {
                                               Image(
-                                                  bitmap = androidx.compose.ui.graphics.asImageBitmap(bitmap),
+                                                  bitmap = bitmap.asImageBitmap(),
                                                   contentDescription = "QR Code PIX",
                                                   modifier = Modifier.size(200.dp).align(Alignment.CenterHorizontally)
                                               )
@@ -686,11 +698,19 @@ private fun AssignDialog(
                                           coroutineScope.launch {
                                               try {
                                                   val response = withContext(Dispatchers.IO) {
-                                                      RetrofitClient.instance.createPix(PixRequest("1", name, "example@email.com", selectedNumbers))
+                                                      RetrofitClient.instance.createPix(
+                                                          PixRequest(
+                                                              raffleId = "1",
+                                                              customerName = name,
+                                                              customerPhone = phone,
+                                                              value = totalPix,
+                                                              numbers = selectedNumbers
+                                                          )
+                                                      )
                                                   }
-                                                  if (response.success && response.qr_code != null) {
-                                                      pixCodeGenerated = response.qr_code
-                                                      qrCodeBase64 = response.qr_code_base64
+                                                  if (response.success && response.payload != null) {
+                                                      pixCodeGenerated = response.payload
+                                                      qrCodeBase64 = response.qrCode
                                                   } else {
                                                       pixCodeGenerated = "Erro: ${response.error}"
                                                   }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -17,12 +19,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
 import com.example.R
 import com.example.data.Ticket
 
 @Composable
 fun DashboardScreen(
     tickets: List<Ticket>,
+    onAdminClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val totalTickets = tickets.size
@@ -41,7 +46,7 @@ fun DashboardScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         item {
-            HeaderSection()
+            HeaderSection(onAdminClick)
         }
         
         item {
@@ -92,9 +97,15 @@ fun DashboardScreen(
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
+            val context = LocalContext.current
             Button(
                 onClick = {
-                    // Logic to share the web link
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, "Participe da Nossa Rifa!")
+                        putExtra(Intent.EXTRA_TEXT, "Compre seu número da rifa e concorra a prêmios incríveis!\nAcesse: https://meu-app-rifa.vercel.app")
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Link da Rifa"))
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,7 +120,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(onAdminClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -133,15 +144,25 @@ fun HeaderSection() {
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.anim_bear_sitting),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                IconButton(onClick = onAdminClick) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Configurações",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.anim_bear_sitting),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                )
+            }
         }
     }
 }
