@@ -62,13 +62,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        checkNotificationStatus()
+        checkPermissions()
     }
 
-    private fun checkNotificationStatus() {
+    private fun checkPermissions() {
         val areEnabled = androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
         if (!areEnabled) {
             showNotificationExplanationDialog()
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            showOverlayExplanationDialog()
+            return
         }
     }
 
@@ -77,18 +83,19 @@ class MainActivity : ComponentActivity() {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
-                checkNotificationStatus()
+                checkPermissions()
             }
         } else {
-            checkNotificationStatus()
+            checkPermissions()
         }
     }
 
-    private var dialogShown = false
+    private var notificationDialogShown = false
+    private var overlayDialogShown = false
 
     private fun showNotificationExplanationDialog() {
-        if (dialogShown) return
-        dialogShown = true
+        if (notificationDialogShown) return
+        notificationDialogShown = true
 
         AlertDialog.Builder(this)
             .setTitle("🔔 Notificações são essenciais!")
@@ -101,16 +108,46 @@ class MainActivity : ComponentActivity() {
                 "Deseja ativar agora?"
             )
             .setPositiveButton("Ativar nas Configurações") { _, _ ->
-                dialogShown = false
+                notificationDialogShown = false
                 val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                     putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
                 }
                 startActivity(intent)
             }
             .setNegativeButton("Depois") { dialog, _ ->
-                dialogShown = false
+                notificationDialogShown = false
                 dialog.dismiss()
                 Toast.makeText(this, "⚠️ Você não receberá alertas de vendas!", Toast.LENGTH_LONG).show()
+                checkPermissions() // check overlay if notification is skipped
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun showOverlayExplanationDialog() {
+        if (overlayDialogShown) return
+        overlayDialogShown = true
+
+        AlertDialog.Builder(this)
+            .setTitle("📱 Permissão de Sobreposição")
+            .setMessage(
+                "Para que os alertas de vendas apareçam na tela mesmo com o aplicativo fechado, você precisa permitir que o app apareça sobre os outros.\n\n" +
+                "Por favor, ative a opção 'Permitir sobreposição a outros apps'."
+            )
+            .setPositiveButton("Configurar") { _, _ ->
+                overlayDialogShown = false
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:$packageName")
+                    )
+                    startActivity(intent)
+                }
+            }
+            .setNegativeButton("Depois") { dialog, _ ->
+                overlayDialogShown = false
+                dialog.dismiss()
+                Toast.makeText(this, "⚠️ Alertas visuais podem não funcionar!", Toast.LENGTH_LONG).show()
             }
             .setCancelable(false)
             .show()
