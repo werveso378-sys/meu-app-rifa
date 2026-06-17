@@ -54,7 +54,7 @@ async function sendNotification(templateId, payloadData = {}) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Basic ${REST_API_KEY}`
+        "Authorization": `Key ${REST_API_KEY}`
       },
       body: JSON.stringify({
         app_id: APP_ID,
