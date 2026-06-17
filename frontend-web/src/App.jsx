@@ -4,6 +4,25 @@ import { reserveNumbersAsMimo } from './services/databaseService';
 import CheckoutModal from './components/CheckoutModal';
 import './App.css';
 
+function OfflineScreen() {
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', backgroundColor: '#F8F5EC', textAlign: 'center', padding: '20px'
+    }}>
+      <img 
+        src="/offline_bear.png" 
+        alt="Offline Bear" 
+        style={{ width: '250px', borderRadius: '24px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', marginBottom: '24px' }} 
+      />
+      <h2 style={{ color: '#4C6A2B', fontSize: '28px', marginBottom: '12px' }}>Sem Conexão</h2>
+      <p style={{ color: '#5A3E26', fontSize: '18px', maxWidth: '300px', lineHeight: '1.5' }}>
+        Estamos offline no momento. Logo, logo estaremos de volta!
+      </p>
+    </div>
+  );
+}
+
 function App() {
   const [tickets, setTickets] = useState([]);
   const [settings, setSettings] = useState({ totalNumbers: 100, pixPrice: 40.0 });
@@ -12,6 +31,20 @@ function App() {
   const [showPromoPopup, setShowPromoPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const playClickSound = () => {
     if (settings.soundsEnabled !== false) {
@@ -88,6 +121,10 @@ function App() {
       setShowSuccessPopup(true);
     }
   };
+
+  if (!isOnline) {
+    return <OfflineScreen />;
+  }
 
   return (
     <div className="app-container">
